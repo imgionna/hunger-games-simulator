@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hunger Games Simulator with Custom Tributes</title>
+  <title>Hunger Games Simulator with Districts and Stats Randomizer</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -13,6 +13,24 @@
     <h2>Add Tribute</h2>
     <form id="tribute-form">
       <input type="text" id="tribute-name" placeholder="Name" required />
+
+      <label for="district">District:</label>
+      <select id="district" required>
+        <option value="" disabled selected>Select district</option>
+        <option value="1">District 1</option>
+        <option value="2">District 2</option>
+        <option value="3">District 3</option>
+        <option value="4">District 4</option>
+        <option value="5">District 5</option>
+        <option value="6">District 6</option>
+        <option value="7">District 7</option>
+        <option value="8">District 8</option>
+        <option value="9">District 9</option>
+        <option value="10">District 10</option>
+        <option value="11">District 11</option>
+        <option value="12">District 12</option>
+        <option value="Capitol">Capitol</option>
+      </select>
 
       <div class="stats-container">
         <label>Combat: <input type="number" id="combat" min="1" max="10" value="5" required /></label>
@@ -32,15 +50,18 @@
         <option value="Spear">Spear</option>
         <option value="Mace">Mace</option>
         <option value="Throwing Knives">Throwing Knives</option>
+        <option value="Hand to Hand">Hand to Hand</option>
+        <option value="No Weapon">No Weapon</option>
       </select>
 
+      <button type="button" id="randomize-btn">Randomize Stats</button>
       <button type="submit">Add Tribute</button>
     </form>
   </section>
 
   <section id="simulation-section" style="display:none;">
     <div id="status"></div>
-    <button id="nextDayBtn">Start Simulation</button>
+    <button id="nextPhaseBtn">Start Simulation</button>
     <ul id="log"></ul>
   </section>
 
