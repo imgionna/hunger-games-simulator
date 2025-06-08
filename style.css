@@ -1,47 +1,32 @@
 body {
   font-family: Arial, sans-serif;
-  background: #222;
-  color: #eee;
-  margin: 20px;
+  padding: 20px;
+  background: #f4f4f4;
 }
 
-input, select, button {
-  margin: 5px;
-  padding: 5px;
-  font-size: 14px;
-}
-
-label {
-  display: inline-block;
-  width: 80px;
-}
-
-.tribute-form {
+#tribute-form {
   margin-bottom: 20px;
 }
 
-.event-log {
-  border: 1px solid #444;
+#tribute-form input,
+#tribute-form select {
+  margin: 5px;
+  padding: 5px;
+}
+
+button {
+  margin: 5px;
   padding: 10px;
-  height: 300px;
-  overflow-y: scroll;
-  background: #111;
+  cursor: pointer;
+}
+
+pre {
+  background: white;
+  padding: 10px;
+  border: 1px solid #ccc;
   white-space: pre-wrap;
 }
 
-.bold {
-  font-weight: bold;
-}
-
 h2 {
-  border-bottom: 1px solid #444;
-  padding-bottom: 3px;
-}
-
-.section-title {
-  margin-top: 15px;
-  font-size: 18px;
-  color: #f0a500;
-  font-weight: bold;
-  text-decoration: underline;
+  margin-top: 30px;
 }
