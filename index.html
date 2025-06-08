@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hunger Games Simulator with Custom Tributes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Hunger Games Simulator</h1>
+
+  <section id="add-tribute-section">
+    <h2>Add Tribute</h2>
+    <form id="tribute-form">
+      <input type="text" id="tribute-name" placeholder="Name" required />
+
+      <div class="stats-container">
+        <label>Combat: <input type="number" id="combat" min="1" max="10" value="5" required /></label>
+        <label>Survival: <input type="number" id="survival" min="1" max="10" value="5" required /></label>
+        <label>Stealth: <input type="number" id="stealth" min="1" max="10" value="5" required /></label>
+        <label>Speed: <input type="number" id="speed" min="1" max="10" value="5" required /></label>
+        <label>Strength: <input type="number" id="strength" min="1" max="10" value="5" required /></label>
+        <label>Intelligence: <input type="number" id="intelligence" min="1" max="10" value="5" required /></label>
+      </div>
+
+      <label for="weapon">Weapon:</label>
+      <select id="weapon" required>
+        <option value="Bow">Bow</option>
+        <option value="Axe">Axe</option>
+        <option value="Sword">Sword</option>
+        <option value="Knife">Knife</option>
+        <option value="Spear">Spear</option>
+        <option value="Mace">Mace</option>
+        <option value="Throwing Knives">Throwing Knives</option>
+      </select>
+
+      <button type="submit">Add Tribute</button>
+    </form>
+  </section>
+
+  <section id="simulation-section" style="display:none;">
+    <div id="status"></div>
+    <button id="nextDayBtn">Start Simulation</button>
+    <ul id="log"></ul>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
