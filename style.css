@@ -1,3 +1,4 @@
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f4f4f4;
@@ -5,7 +6,6 @@ body {
   margin: 0;
   padding: 0;
 }
-
 .container {
   max-width: 960px;
   margin: 2rem auto;
@@ -14,36 +14,22 @@ body {
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
 }
-
 h1, h2 {
   text-align: center;
   color: #333;
 }
-
 form {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
 }
-
 input, select, button {
   padding: 0.6rem;
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 1rem;
 }
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
 button {
   background-color: #007bff;
   color: white;
@@ -52,17 +38,14 @@ button {
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
 }
-
 button:hover {
   background-color: #0056b3;
 }
-
 .stat-buttons {
   display: flex;
   gap: 1rem;
   grid-column: span 2;
 }
-
 #event-log {
   white-space: pre-line;
   background: #111;
@@ -75,7 +58,6 @@ button:hover {
   font-size: 0.95rem;
   margin-top: 1rem;
 }
-
 #download-log, #restart {
   display: none;
   margin-top: 1.5rem;
@@ -86,16 +68,13 @@ button:hover {
   color: white;
   border: none;
 }
-
 #download-log:hover, #restart:hover {
   background-color: #218838;
 }
-
 @media (max-width: 600px) {
   form {
     grid-template-columns: 1fr;
   }
-
   .stat-buttons {
     flex-direction: column;
     grid-column: span 1;
