@@ -14,7 +14,7 @@ let tributes = [];
 let simulationLog = [];
 let simulationStarted = false;
 
-// Random integer inclusive helper
+// Helper: random int inclusive
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -31,7 +31,7 @@ function randomizeStats() {
   };
 }
 
-// Randomize weapon
+// Randomize weapon based on stats
 function randomizeWeapon(stats) {
   const {combat, strength, stealth, speed} = stats;
   if (combat >= 7 && strength >= 7) {
@@ -47,7 +47,7 @@ function randomizeWeapon(stats) {
 function updateTributesList() {
   const ul = document.getElementById("tributes-list");
   ul.innerHTML = "";
-  tributes.forEach((t, idx) => {
+  tributes.forEach((t) => {
     const li = document.createElement("li");
     li.textContent = `${t.name} | Age: ${t.age} | Gender: ${t.gender} | Weapon: ${t.weapon}`;
     ul.appendChild(li);
@@ -70,7 +70,7 @@ function addEventLog(text) {
   p.innerHTML = text;
   eventLog.appendChild(p);
   eventLog.scrollTop = eventLog.scrollHeight;
-  simulationLog.push(text);
+  simulationLog.push(text.replace(/<[^>]+>/g, '')); // log without html tags for text file
 }
 
 // Add tribute function
@@ -81,6 +81,8 @@ function addTribute() {
   }
   const nameInput = document.getElementById("tribute-name");
   const districtInput = document.getElementById("tribute-district");
+  const ageInput = document.getElementById("tribute-age");
+  const genderInput = document.getElementById("tribute-gender");
   const combatInput = document.getElementById("combat");
   const survivalInput = document.getElementById("survival");
   const stealthInput = document.getElementById("stealth");
@@ -96,6 +98,9 @@ function addTribute() {
   }
   const district = districtInput.value;
 
+  const age = Number(ageInput.value) || randomInt(12, 18);
+  const gender = genderInput.value || (Math.random() < 0.5 ? "Male" : "Female");
+
   const stats = {
     combat: Number(combatInput.value) || randomInt(1,10),
     survival: Number(survivalInput.value) || randomInt(1,10),
@@ -104,9 +109,6 @@ function addTribute() {
     strength: Number(strengthInput.value) || randomInt(1,10),
     intelligence: Number(intelligenceInput.value) || randomInt(1,10),
   };
-
-  const age = randomInt(12,18);
-  const gender = Math.random() < 0.5 ? "Male" : "Female";
 
   let weapon = weaponInput.value;
   if (!weapons.includes(weapon)) {
@@ -120,6 +122,7 @@ function addTribute() {
     stats,
     weapon,
     alive: true,
+    fallenLogged: false,
   };
 
   tributes.push(tribute);
@@ -128,7 +131,9 @@ function addTribute() {
   addEventLogSection("Reaping");
   addEventLog(`<span class="bold">${tribute.name} (Age: ${tribute.age}, ${tribute.gender})</span> has been reaped.`);
 
+  // Clear inputs
   nameInput.value = "";
+  ageInput.value = "";
   combatInput.value = "";
   survivalInput.value = "";
   stealthInput.value = "";
@@ -164,6 +169,12 @@ document.getElementById("randomize-weapon").onclick = () => {
   };
   const w = randomizeWeapon(stats);
   document.getElementById("weapon").value = w;
+};
+
+// Randomize age & gender button
+document.getElementById("randomize-age-gender").onclick = () => {
+  document.getElementById("tribute-age").value = randomInt(12, 18);
+  document.getElementById("tribute-gender").value = Math.random() < 0.5 ? "Male" : "Female";
 };
 
 // Add tribute button
