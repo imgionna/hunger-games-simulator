@@ -26,6 +26,7 @@ label {
   height: 300px;
   overflow-y: scroll;
   background: #111;
+  white-space: pre-wrap;
 }
 
 .bold {
@@ -41,4 +42,6 @@ h2 {
   margin-top: 15px;
   font-size: 18px;
   color: #f0a500;
+  font-weight: bold;
+  text-decoration: underline;
 }
