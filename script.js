@@ -1,36 +1,10 @@
 const tributes = [];
 let dayCount = 1;
 let gameLog = "";
+let tempAge = 12; // temp variable for random age
 
-function addTribute() {
-  const name = document.getElementById("name").value;
-  const district = parseInt(document.getElementById("district").value);
-  const gender = document.getElementById("gender").value;
-  const combat = parseInt(document.getElementById("combat").value);
-  const survival = parseInt(document.getElementById("survival").value);
-  const stealth = parseInt(document.getElementById("stealth").value);
-  const speed = parseInt(document.getElementById("speed").value);
-  const strength = parseInt(document.getElementById("strength").value);
-  const intelligence = parseInt(document.getElementById("intelligence").value);
-  const weapon = document.getElementById("weapon").value;
-  const age = randomBetween(12, 18);
-
-  if (!name || !district || !gender || !weapon) {
-    alert("Please complete all tribute fields.");
-    return;
-  }
-
-  tributes.push({
-    name,
-    district,
-    gender,
-    age,
-    stats: { combat, survival, stealth, speed, strength, intelligence },
-    weapon,
-    alive: true
-  });
-
-  logEvent("Reaping", `**${name} (D${district})**, a ${age}-year-old ${gender}, has been reaped.`);
+function randomBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function randomizeStats() {
@@ -40,17 +14,63 @@ function randomizeStats() {
   document.getElementById("speed").value = randomBetween(1, 10);
   document.getElementById("strength").value = randomBetween(1, 10);
   document.getElementById("intelligence").value = randomBetween(1, 10);
+  tempAge = randomBetween(12, 18);
 }
 
 function randomizeWeapon() {
-  const weapons = ["Bow", "Axe", "Sword", "Knife", "Spear", "Mace", "Throwing Knives", "Hand to Hand", "No Weapon"];
-  const index = Math.floor(Math.random() * weapons.length);
-  document.getElementById("weapon").value = weapons[index];
+  const weapons = [
+    "Bow", "Axe", "Sword", "Knife",
+    "Spear", "Mace", "Throwing Knives",
+    "Hand to Hand", "No Weapon"
+  ];
+  const randomWeapon = weapons[Math.floor(Math.random() * weapons.length)];
+  document.getElementById("weapon").value = randomWeapon;
+}
+
+function addTribute() {
+  const name = document.getElementById("name").value.trim();
+  const district = parseInt(document.getElementById("district").value);
+  const gender = document.getElementById("gender").value;
+
+  if (!name || !district || isNaN(district) || district < 1 || district > 12) {
+    alert("Please provide a valid name and district (1-12).");
+    return;
+  }
+
+  const stats = {
+    combat: parseInt(document.getElementById("combat").value),
+    survival: parseInt(document.getElementById("survival").value),
+    stealth: parseInt(document.getElementById("stealth").value),
+    speed: parseInt(document.getElementById("speed").value),
+    strength: parseInt(document.getElementById("strength").value),
+    intelligence: parseInt(document.getElementById("intelligence").value)
+  };
+
+  const weapon = document.getElementById("weapon").value;
+
+  if (Object.values(stats).some(stat => isNaN(stat) || stat < 1 || stat > 10)) {
+    alert("Stats must be between 1 and 10.");
+    return;
+  }
+
+  const tribute = {
+    name,
+    district,
+    gender,
+    age: tempAge || randomBetween(12, 18),
+    stats,
+    weapon,
+    alive: true,
+    loggedDead: false
+  };
+
+  tributes.push(tribute);
+  logEvent("Reaping", `**${name} (D${district})**, a ${tribute.age}-year-old ${gender}, has been reaped.`);
 }
 
 function startSimulation() {
   if (tributes.length < 2) {
-    alert("At least 2 tributes required.");
+    alert("Add at least 2 tributes.");
     return;
   }
 
@@ -63,30 +83,31 @@ function startSimulation() {
   }
 
   const winner = tributes.find(t => t.alive);
-  logEvent("Game Over", `🏆 **${winner.name} (D${winner.district})** has won the Hunger Games!`);
+  logEvent("Game Over", `🏆 **${winner.name} (D${winner.district})** wins the Hunger Games!`);
 }
 
 function simulateDay() {
   logEvent(`Day ${dayCount}`, "");
-  randomEvents("day");
+  randomEvents();
 }
 
 function simulateNight() {
   logEvent(`Night ${dayCount}`, "");
-  randomEvents("night");
+  randomEvents();
 
   const fallen = tributes.filter(t => !t.alive && !t.loggedDead);
-  if (fallen.length > 0) {
+  if (fallen.length) {
     logEvent("Fallen Tributes", "");
     fallen.forEach(t => {
-      logEvent("", `💀 **${t.name} (D${t.district})** has fallen. *BOOM* 💣`);
+      logEvent("", `💀 **${t.name} (D${t.district})** has fallen. *BOOM*`);
       t.loggedDead = true;
     });
   }
+
   dayCount++;
 }
 
-function randomEvents(period) {
+function randomEvents() {
   const alive = tributes.filter(t => t.alive);
   for (let i = 0; i < alive.length; i++) {
     if (Math.random() < 0.3 && alive.length > 1) {
@@ -96,12 +117,14 @@ function randomEvents(period) {
         victim = alive[Math.floor(Math.random() * alive.length)];
       } while (victim === attacker);
 
-      const attackerPower = attacker.stats.combat + attacker.stats.strength + attacker.stats.speed;
-      const victimDefense = victim.stats.survival + victim.stats.stealth + victim.stats.intelligence;
+      const attackPower =
+        attacker.stats.combat + attacker.stats.strength + attacker.stats.speed + attacker.stats.intelligence;
+      const defense =
+        victim.stats.survival + victim.stats.stealth + victim.stats.intelligence;
 
-      if (attackerPower + randomBetween(0, 10) > victimDefense + randomBetween(0, 10)) {
+      if (attackPower + randomBetween(0, 10) > defense + randomBetween(0, 10)) {
         victim.alive = false;
-        logEvent("", `**${attacker.name} (D${attacker.district})** attacked and eliminated **${victim.name} (D${victim.district})** with a ${attacker.weapon}.`);
+        logEvent("", `**${attacker.name} (D${attacker.district})** eliminated **${victim.name} (D${victim.district})** with a ${attacker.weapon}.`);
       } else {
         logEvent("", `**${attacker.name} (D${attacker.district})** tried to attack **${victim.name} (D${victim.district})**, but failed.`);
       }
@@ -125,8 +148,4 @@ function downloadLog() {
 
 function restartGame() {
   location.reload();
-}
-
-function randomBetween(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
