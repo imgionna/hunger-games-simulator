@@ -33,8 +33,8 @@ h1, h2 {
 }
 
 button {
-  display: block;
-  margin: 20px auto;
+  display: inline-block;
+  margin: 10px 5px 0 0;
   padding: 10px 15px;
   font-size: 16px;
   cursor: pointer;
@@ -46,6 +46,7 @@ button {
   gap: 10px;
   justify-content: center;
   margin-bottom: 20px;
+  align-items: center;
 }
 
 #tribute-form input[type="text"], 
