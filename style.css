@@ -1,32 +1,92 @@
 body {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-  background: #f4f4f4;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f4;
+  color: #222;
+  margin: 0;
+  padding: 0;
 }
 
-#tribute-form {
-  margin-bottom: 20px;
+h1, h2, h3 {
+  text-align: center;
+  margin-top: 1rem;
+  color: #333;
 }
 
-#tribute-form input,
-#tribute-form select {
-  margin: 5px;
-  padding: 5px;
+.container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+label {
+  font-weight: bold;
+}
+
+input, select, button {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 button {
-  margin: 5px;
-  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
 }
 
-pre {
-  background: white;
-  padding: 10px;
-  border: 1px solid #ccc;
-  white-space: pre-wrap;
+button:hover {
+  background-color: #0056b3;
 }
 
-h2 {
-  margin-top: 30px;
+#event-log {
+  white-space: pre-line;
+  background: #111;
+  color: #0f0;
+  padding: 1rem;
+  border-radius: 10px;
+  max-height: 500px;
+  overflow-y: scroll;
+  font-family: 'Courier New', Courier, monospace;
+  margin-top: 2rem;
+}
+
+#download-log, #restart {
+  display: none;
+  margin: 1rem auto;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #28a745;
+  color: white;
+}
+
+#download-log:hover, #restart:hover {
+  background-color: #218838;
+}
+
+.stat-buttons {
+  display: flex;
+  gap: 1rem;
+  grid-column: span 2;
+}
+
+@media (max-width: 600px) {
+  form {
+    grid-template-columns: 1fr;
+  }
 }
