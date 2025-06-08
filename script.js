@@ -19,6 +19,7 @@ const tributeForm = document.getElementById("tribute-form");
 const simulationSection = document.getElementById("simulation-section");
 const addTributeSection = document.getElementById("add-tribute-section");
 const randomizeBtn = document.getElementById("randomize-btn");
+const randomizeWeaponBtn = document.getElementById("randomize-weapon-btn");
 
 function logEvent(text) {
   const li = document.createElement("li");
@@ -147,10 +148,6 @@ tributeForm.addEventListener("submit", e => {
   }
 });
 
-nextPhaseBtn.addEventListener("click", () => {
-  simulateDayOrNight();
-});
-
 // Randomize stats button
 randomizeBtn.addEventListener("click", () => {
   const randomStat = () => Math.floor(Math.random() * 10) + 1;
@@ -160,4 +157,26 @@ randomizeBtn.addEventListener("click", () => {
   document.getElementById("speed").value = randomStat();
   document.getElementById("strength").value = randomStat();
   document.getElementById("intelligence").value = randomStat();
+});
+
+// Randomize weapon button
+const weapons = [
+  "Bow",
+  "Axe",
+  "Sword",
+  "Knife",
+  "Spear",
+  "Mace",
+  "Throwing Knives",
+  "Hand to Hand",
+  "No Weapon",
+];
+
+randomizeWeaponBtn.addEventListener("click", () => {
+  const randomWeapon = getRandomItem(weapons);
+  document.getElementById("weapon").value = randomWeapon;
+});
+
+nextPhaseBtn.addEventListener("click", () => {
+  simulateDayOrNight();
 });
