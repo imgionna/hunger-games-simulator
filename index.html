@@ -1,77 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hunger Games Simulator</title>
-<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hunger Games Simulator</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <h1>Hunger Games Simulator</h1>
 
-<h1>Hunger Games Simulator</h1>
+  <div id="tribute-form">
+    <input id="name" placeholder="Name" />
+    <input id="district" placeholder="District (1-12)" type="number" min="1" max="12"/>
+    <select id="gender">
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
 
-<div class="tribute-form">
-  <h2>Add Custom Tribute</h2>
-  <label>Name:</label><input type="text" id="tribute-name" placeholder="Tribute Name" />
-  <label>District:</label>
-  <select id="tribute-district">
-    <option value="1">District 1</option>
-    <option value="2">District 2</option>
-    <option value="3">District 3</option>
-    <option value="4">District 4</option>
-    <option value="5">District 5</option>
-    <option value="6">District 6</option>
-    <option value="7">District 7</option>
-    <option value="8">District 8</option>
-    <option value="9">District 9</option>
-    <option value="10">District 10</option>
-    <option value="11">District 11</option>
-    <option value="12">District 12</option>
-  </select>
-  <br />
-  <label>Age:</label><input type="number" id="tribute-age" min="12" max="18" placeholder="12-18" />
-  <label>Gender:</label>
-  <select id="tribute-gender">
-    <option value="Male">Male</option>
-    <option value="Female">Female</option>
-  </select>
-  <button id="randomize-age-gender">Randomize Age & Gender</button>
-  <br />
-  <label>Combat:</label><input type="number" min="1" max="10" id="combat" />
-  <label>Survival:</label><input type="number" min="1" max="10" id="survival" />
-  <label>Stealth:</label><input type="number" min="1" max="10" id="stealth" />
-  <label>Speed:</label><input type="number" min="1" max="10" id="speed" />
-  <label>Strength:</label><input type="number" min="1" max="10" id="strength" />
-  <label>Intelligence:</label><input type="number" min="1" max="10" id="intelligence" />
-  <br />
-  <label>Weapon:</label>
-  <select id="weapon">
-    <option value="bow">Bow</option>
-    <option value="axe">Axe</option>
-    <option value="sword">Sword</option>
-    <option value="knife">Knife</option>
-    <option value="spear">Spear</option>
-    <option value="mace">Mace</option>
-    <option value="throwing knives">Throwing Knives</option>
-    <option value="hand to hand">Hand to Hand</option>
-    <option value="no weapon">No Weapon</option>
-  </select>
-  <br />
-  <button id="randomize-stats">Randomize Stats</button>
-  <button id="randomize-weapon">Randomize Weapon</button>
-  <button id="add-tribute">Add Tribute</button>
-</div>
+    <div id="stats">
+      <label>Combat: <input type="number" id="combat" min="1" max="10" /></label>
+      <label>Survival: <input type="number" id="survival" min="1" max="10" /></label>
+      <label>Stealth: <input type="number" id="stealth" min="1" max="10" /></label>
+      <label>Speed: <input type="number" id="speed" min="1" max="10" /></label>
+      <label>Strength: <input type="number" id="strength" min="1" max="10" /></label>
+      <label>Intelligence: <input type="number" id="intelligence" min="1" max="10" /></label>
+    </div>
 
-<button id="start-simulation">Start Simulation</button>
-<button id="restart-reaping" style="display:none;">Restart Reaping</button>
-<button id="download-log" style="display:none;">Download Simulation Log</button>
+    <label>Weapon:
+      <select id="weapon">
+        <option value="Bow">Bow</option>
+        <option value="Axe">Axe</option>
+        <option value="Sword">Sword</option>
+        <option value="Knife">Knife</option>
+        <option value="Spear">Spear</option>
+        <option value="Mace">Mace</option>
+        <option value="Throwing Knives">Throwing Knives</option>
+        <option value="Hand to Hand">Hand to Hand</option>
+        <option value="No Weapon">No Weapon</option>
+      </select>
+    </label>
 
-<h2>Tributes</h2>
-<ul id="tributes-list"></ul>
+    <button onclick="randomizeStats()">Randomize Stats</button>
+    <button onclick="randomizeWeapon()">Randomize Weapon</button>
+    <button onclick="addTribute()">Add Tribute</button>
+  </div>
 
-<h2>Event Log</h2>
-<div id="event-log" class="event-log"></div>
+  <button onclick="startSimulation()">Start Simulation</button>
 
-<script src="script.js"></script>
+  <div id="log-container">
+    <h2>Event Log</h2>
+    <pre id="event-log"></pre>
+    <button id="download-log" onclick="downloadLog()" style="display: none;">Download Log</button>
+    <button id="restart" onclick="restartGame()" style="display: none;">Restart Reaping</button>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
