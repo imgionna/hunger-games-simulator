@@ -1,12 +1,30 @@
 const tributes = [];
-let dayCount = 1;
+let dayCount = 0;
 let gameLog = "";
 let alliances = []; // to track groups
 let careerPack = []; // alliance for careers
 let eventsToday = 0;
 
+// Preloaded actions
+const actions = {
+  bloodbath: [...`...`, // fill with bloodbath strings
+  ],
+  combatKill: [...`...`, // combat kill strings
+  ],
+  combatSurvive: [...`...`, // combat survive strings
+  survival: [...`...`], // neutral survival strings
+  alliance: [...`...`], // alliance/betrayal strings
+  feastCombat: [...`...`],
+  feastSurvive: [...`...`],
+  naturalDeath: [...`...`]
+};
+
 function randomBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomChoice(list) {
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 function randomizeStats() {
@@ -27,6 +45,11 @@ function randomizeWeapon() {
   ];
   const randomWeapon = weapons[Math.floor(Math.random() * weapons.length)];
   document.getElementById("weapon").value = randomWeapon;
+}
+
+function randomizeName() {
+  const names = ["Ash", "Rowan", "Lark", "Quinn", "Reed", "Kai", "Nova", "Juno", "Vale", "Skye"];
+  document.getElementById("name").value = randomChoice(names);
 }
 
 function addTribute() {
@@ -68,10 +91,7 @@ function addTribute() {
   };
 
   tributes.push(tribute);
-
-  // auto-career pack
   if ([1, 2, 4].includes(district)) careerPack.push(tribute);
-
   logEvent("Reaping", `**${name} (D${district})**, a ${age}-year-old ${gender}, has been reaped.`);
 }
 
@@ -83,8 +103,8 @@ function startSimulation() {
   document.getElementById("download-log").style.display = "inline-block";
   document.getElementById("restart").style.display = "inline-block";
 
-  // set up alliances
   alliances.push(careerPack);
+  simulateBloodbath();
 
   while (tributes.filter(t => t.alive).length > 1) {
     simulateDay();
@@ -96,17 +116,20 @@ function startSimulation() {
   logEvent("Game Over", `\uD83C\uDFC6 **${winner.name} (D${winner.district})** wins the Hunger Games!`);
 }
 
+function simulateBloodbath() {
+  logEvent("Bloodbath", "Tributes rush the Cornucopia!");
+  simulateEncounters(false, true);
+  dayCount = 1;
+}
+
 function simulateDay() {
   logEvent(`Day ${dayCount}`, "");
-  eventsToday = 0;
   simulateEncounters();
 }
 
 function simulateNight() {
   logEvent(`Night ${dayCount}`, "");
-  eventsToday = 0;
   simulateEncounters(true);
-
   const fallen = tributes.filter(t => !t.alive && !t.loggedDead);
   if (fallen.length) {
     logEvent("Fallen Tributes", "");
@@ -118,7 +141,7 @@ function simulateNight() {
   dayCount++;
 }
 
-function simulateEncounters(isNight = false) {
+function simulateEncounters(isNight = false, isBloodbath = false) {
   const alive = tributes.filter(t => t.alive);
   const shuffled = [...alive].sort(() => Math.random() - 0.5);
 
@@ -126,32 +149,29 @@ function simulateEncounters(isNight = false) {
     const actor = shuffled[i];
     if (!actor.alive) continue;
 
-    if (Math.random() < 0.25 && shuffled.length > 1) {
+    if (Math.random() < 0.4 && shuffled.length > 1) {
       let target;
       do {
         target = shuffled[Math.floor(Math.random() * shuffled.length)];
       } while (target === actor || !target.alive);
 
-      // betrayal chance within alliance
       const sameAlliance = alliances.some(group => group.includes(actor) && group.includes(target));
       if (sameAlliance && Math.random() < 0.85) continue;
 
-      const attack = actor.stats.combat + actor.stats.strength + actor.stats.speed;
-      const defense = target.stats.survival + target.stats.stealth;
-
-      const attackScore = attack + randomBetween(0, 10);
-      const defenseScore = defense + randomBetween(0, 10);
+      const attackScore = actor.stats.combat + actor.stats.strength + actor.stats.speed + randomBetween(0, 10);
+      const defenseScore = target.stats.survival + target.stats.stealth + randomBetween(0, 10);
 
       if (attackScore > defenseScore) {
         target.alive = false;
-        logEvent("", `**${actor.name} (D${actor.district})** ambushed and killed **${target.name} (D${target.district})** using a ${actor.weapon}.`);
+        const template = isBloodbath ? randomChoice(actions.bloodbath) : randomChoice(actions.combatKill);
+        logEvent("", formatTemplate(template, actor, target));
       } else {
-        const verbs = ["tried to ambush", "clashed with", "attacked but failed against"];
-        const verb = verbs[Math.floor(Math.random() * verbs.length)];
-        logEvent("", `**${actor.name} (D${actor.district})** ${verb} **${target.name} (D${target.district})** but failed.`);
+        const template = randomChoice(actions.combatSurvive);
+        logEvent("", formatTemplate(template, actor, target));
       }
     } else if (Math.random() < 0.2) {
-      logEvent("", `**${actor.name} (D${actor.district})** scavenges for resources and avoids conflict.`);
+      const template = randomChoice(actions.survival);
+      logEvent("", formatTemplate(template, actor));
     }
   }
 }
@@ -161,11 +181,30 @@ function triggerFeast() {
   const contenders = tributes.filter(t => t.alive);
   contenders.forEach(t => {
     if (Math.random() < 0.5) {
-      logEvent("", `**${t.name} (D${t.district})** risks the feast and gains supplies.`);
+      logEvent("", formatTemplate(randomChoice(actions.feastSurvive), t));
     } else {
-      logEvent("", `**${t.name} (D${t.district})** stays away from the feast, avoiding danger.`);
+      const others = contenders.filter(o => o !== t);
+      if (others.length) {
+        const enemy = randomChoice(others);
+        if (Math.random() < 0.6) {
+          enemy.alive = false;
+          logEvent("", formatTemplate(randomChoice(actions.feastCombat), t, enemy));
+        } else {
+          logEvent("", formatTemplate(randomChoice(actions.combatSurvive), t, enemy));
+        }
+      }
     }
   });
+}
+
+function formatTemplate(template, actor, target = {}) {
+  return template
+    .replaceAll("${actor.name}", actor.name)
+    .replaceAll("${actor.district}", actor.district)
+    .replaceAll("${actor.weapon}", actor.weapon)
+    .replaceAll("${target.name}", target.name || "")
+    .replaceAll("${target.district}", target.district || "")
+    .replaceAll("${target.weapon}", target.weapon || "");
 }
 
 function logEvent(title, message) {
