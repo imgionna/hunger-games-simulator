@@ -6,43 +6,48 @@ body {
   padding: 0;
 }
 
-h1, h2, h3 {
-  text-align: center;
-  margin-top: 1rem;
-  color: #333;
+.container {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
 }
 
-.container {
-  max-width: 1000px;
-  margin: 2rem auto;
-  padding: 1rem;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+h1, h2 {
+  text-align: center;
+  color: #333;
 }
 
 form {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-label {
-  font-weight: bold;
+  margin-bottom: 2rem;
 }
 
 input, select, button {
-  padding: 0.5rem;
+  padding: 0.6rem;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 100%;
-  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 button {
   background-color: #007bff;
   color: white;
+  border: none;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
@@ -50,6 +55,12 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.stat-buttons {
+  display: flex;
+  gap: 1rem;
+  grid-column: span 2;
 }
 
 #event-log {
@@ -61,32 +72,32 @@ button:hover {
   max-height: 500px;
   overflow-y: scroll;
   font-family: 'Courier New', Courier, monospace;
-  margin-top: 2rem;
+  font-size: 0.95rem;
+  margin-top: 1rem;
 }
 
 #download-log, #restart {
   display: none;
-  margin: 1rem auto;
+  margin-top: 1.5rem;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
-  border: none;
   border-radius: 8px;
   background-color: #28a745;
   color: white;
+  border: none;
 }
 
 #download-log:hover, #restart:hover {
   background-color: #218838;
 }
 
-.stat-buttons {
-  display: flex;
-  gap: 1rem;
-  grid-column: span 2;
-}
-
 @media (max-width: 600px) {
   form {
     grid-template-columns: 1fr;
+  }
+
+  .stat-buttons {
+    flex-direction: column;
+    grid-column: span 1;
   }
 }
