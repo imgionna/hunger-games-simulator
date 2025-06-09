@@ -1,55 +1,96 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: #fffafc;
-  color: #333;
   text-align: center;
+  background-color: #f8f4f9;
+  color: #333;
   padding: 20px;
+  margin: 0;
 }
 
 h1 {
-  font-size: 2.5em;
-  margin-bottom: 20px;
+  font-size: 2.2rem;
+  margin-bottom: 15px;
+  color: #ac2bac;
 }
 
-.controls, .tribute-form, .skills {
-  margin: 10px auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+h2 {
+  margin-top: 30px;
+  color: #5d2078;
 }
 
 input, select, button {
   padding: 8px;
-  font-size: 1em;
-  border-radius: 8px;
+  margin: 5px;
+  border-radius: 6px;
   border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+input:focus, select:focus {
+  border-color: #a342b2;
+  outline: none;
 }
 
 button {
-  background: #f0c7d9;
-  border: none;
+  background-color: #d278e6;
+  color: white;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background-color 0.2s ease;
 }
 
 button:hover {
-  background: #fdaecf;
+  background-color: #b659cc;
 }
 
-.event-log {
-  background: #fff;
-  border: 1px solid #eee;
-  padding: 20px;
-  margin-top: 20px;
-  max-height: 400px;
-  overflow-y: scroll;
-  text-align: left;
-  white-space: pre-wrap;
-  font-size: 1em;
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.form-section {
+  margin: 20px auto;
+  max-width: 600px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.buttons {
+  width: 100%;
+  margin-top: 10px;
 }
 
 .tribute-list {
-  margin: 20px auto;
-  font-weight: bold;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-family: monospace;
+}
+
+.event-log {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #f0e6f7;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #caa6e1;
+  white-space: pre-wrap;
+  text-align: left;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
 }
