@@ -28,7 +28,7 @@ function roundUpAvg(...values) {
 
 function renderTributeList() {
   tributeList.innerHTML = tributes.map(t =>
-    `${t.name} (${t.gender}, D${t.district}, Weapon: ${t.weapon}, Score: ${t.trainingScore})`
+    `${t.name} (${t.gender}, Age ${t.age}, D${t.district}, Weapon: ${t.weapon}, Score: ${t.trainingScore})`
   ).join("<br>");
 }
 
@@ -55,6 +55,7 @@ function randomSkill() {
 }
 
 randomizeBtn.addEventListener("click", () => {
+  document.getElementById("age").value = Math.floor(Math.random() * 8) + 12; // 12–19
   document.getElementById("weapon").value = randomWeapon();
   ["combat", "survival", "stealth", "speed", "strength", "intelligence"].forEach(id => {
     document.getElementById(id).value = randomSkill();
@@ -86,23 +87,24 @@ function tributeDies(victim) {
 }
 
 function selectCombatPair() {
-  let a, b;
-  const shuffled = aliveTributes.sort(() => 0.5 - Math.random());
+  const shuffled = [...aliveTributes].sort(() => 0.5 - Math.random());
 
   for (let i = 0; i < shuffled.length; i++) {
-    a = shuffled[i];
-    for (let j = 0; j < shuffled.length; j++) {
-      b = shuffled[j];
-      if (a !== b && a.district !== b.district) {
-        return [a, b]; // different district pair found
-      }
+    let a = shuffled[i];
+    for (let j = i + 1; j < shuffled.length; j++) {
+      let b = shuffled[j];
+      if (a.district !== b.district) return [a, b]; // Prefer different districts
     }
   }
 
-  // fallback: allow same district only if nothing else is possible
-  a = shuffled[0];
-  b = shuffled.find(t => t !== a);
-  return [a, b];
+  // fallback — allow same district
+  return [shuffled[0], shuffled[1]];
+}
+
+function getCombatWinner(a, b) {
+  const aRoll = Math.random() * (a.trainingScore + 5);
+  const bRoll = Math.random() * (b.trainingScore + 5);
+  return aRoll >= bRoll ? a : b;
 }
 
 function simulateFallenTributes() {
@@ -119,11 +121,57 @@ function simulateFallenTributes() {
   fallenTributes = [];
 }
 
+function randomTribute(exclude = null) {
+  const options = aliveTributes.filter(t => t !== exclude);
+  return options[Math.floor(Math.random() * options.length)];
+}
+
+function shuffle(arr) {
+  return arr.sort(() => 0.5 - Math.random());
+}
+
 function simulateArenaEvent() {
-  if (Math.random() < 0.3) {
-    logEvent(`🌪️ A sudden storm ravages the arena! Everyone scrambles for cover.`);
-  } else if (Math.random() < 0.2) {
-    logEvent(`🐻 Mutts are released into the arena, causing chaos!`);
+  const eventType = Math.random();
+
+  if (eventType < 0.33) {
+    logEvent(`🐺 Mutts are released into the arena!`);
+    const victim = randomTribute();
+    const attacker = randomTribute(victim);
+    const winner = getCombatWinner(victim, attacker);
+    const loser = winner === victim ? attacker : victim;
+    if (loser) {
+      tributeDies(loser);
+      logEvent(`🩸 ${bold(loser)} was mauled by mutts while ${bold(winner)} escaped!`);
+    }
+  } else if (eventType < 0.66) {
+    logEvent(`🌪️ A sudden storm lashes the arena.`);
+    const affected = randomTribute();
+    const survived = Math.random() < affected.trainingScore / 20;
+    if (!survived) {
+      tributeDies(affected);
+      logEvent(`⚡ ${bold(affected)} was crushed by debris during the storm.`);
+    } else {
+      logEvent(`☔ ${bold(affected)} found shelter in time.`);
+    }
+  } else {
+    logEvent(`🍖 A feast is announced at the Cornucopia! Supplies await...`);
+    const tribs = shuffle([...aliveTributes]).slice(0, 4);
+
+    if (tribs.length >= 2) {
+      const [a, b] = [tribs[0], tribs[1]];
+      const winner = getCombatWinner(a, b);
+      const loser = winner === a ? b : a;
+      tributeDies(loser);
+      logEvent(`🥩 ${bold(winner)} kills ${bold(loser)} in a feast skirmish!`);
+    }
+
+    tribs.slice(2).forEach(t => {
+      if (Math.random() < 0.5) {
+        logEvent(`🍞 ${bold(t)} sneaks in and grabs supplies!`);
+      } else {
+        logEvent(`🚫 ${bold(t)} hesitates and leaves empty-handed.`);
+      }
+    });
   }
 }
 
@@ -134,8 +182,7 @@ function simulateDay() {
     for (let i = 0; i < initialKills; i++) {
       const [a, b] = selectCombatPair();
       if (!a || !b) break;
-
-      const winner = a.trainingScore + Math.random() * 5 > b.trainingScore + Math.random() * 5 ? a : b;
+      const winner = getCombatWinner(a, b);
       const loser = winner === a ? b : a;
       tributeDies(loser);
       logEvent(`🩸 ${bold(winner)} strikes down ${bold(loser)} with a ${winner.weapon}!`);
@@ -150,21 +197,19 @@ function simulateDay() {
 
   if (aliveTributes.length > 1 && Math.random() < 0.6) {
     const [a, b] = selectCombatPair();
-    if (!a || !b) return;
-
-    const winner = a.trainingScore + Math.random() * 5 > b.trainingScore + Math.random() * 5 ? a : b;
+    const winner = getCombatWinner(a, b);
     const loser = winner === a ? b : a;
     tributeDies(loser);
     logEvent(`⚔️ ${bold(winner)} defeats ${bold(loser)} in a surprise attack.`);
   } else {
-    const survivor = aliveTributes[Math.floor(Math.random() * aliveTributes.length)];
+    const survivor = randomTribute();
     logEvent(`🍂 ${bold(survivor)} spends the day hiding in the trees.`);
   }
 
   logEvent(`\n🌙 <b>Night ${dayCount}</b>`);
   if (Math.random() < 0.4 && aliveTributes.length > 1) {
     const [a, b] = selectCombatPair();
-    const winner = a.trainingScore + Math.random() * 5 > b.trainingScore + Math.random() * 5 ? a : b;
+    const winner = getCombatWinner(a, b);
     const loser = winner === a ? b : a;
     tributeDies(loser);
     logEvent(`🌌 Under the stars, ${bold(winner)} ambushes ${bold(loser)} in their sleep.`);
