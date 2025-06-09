@@ -2,63 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hunger Games Simulator</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
+  <header>
     <h1>Hunger Games Simulator</h1>
+  </header>
 
+  <section id="district-roster">
+    <h2>Districts & Tributes</h2>
+    <div id="districts-container"></div>
+  </section>
+
+  <section id="tribute-creation">
+    <h2>Create Tribute</h2>
     <form id="tribute-form">
-      <input id="name" placeholder="Name" />
-      <button type="button" onclick="randomizeName()">🎲 Random Name</button>
-
-      <input id="district" placeholder="District (1–12)" type="number" min="1" max="12"/>
-      
-      <select id="gender">
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-
-      <input id="age" type="number" min="12" max="18" placeholder="Age (12–18)" />
-
-      <label>Combat: <input type="number" id="combat" min="1" max="10" /></label>
-      <label>Survival: <input type="number" id="survival" min="1" max="10" /></label>
-      <label>Stealth: <input type="number" id="stealth" min="1" max="10" /></label>
-      <label>Speed: <input type="number" id="speed" min="1" max="10" /></label>
-      <label>Strength: <input type="number" id="strength" min="1" max="10" /></label>
-      <label>Intelligence: <input type="number" id="intelligence" min="1" max="10" /></label>
-
-      <label>Weapon:
-        <select id="weapon">
-          <option value="Bow">Bow</option>
-          <option value="Axe">Axe</option>
-          <option value="Sword">Sword</option>
-          <option value="Knife">Knife</option>
-          <option value="Spear">Spear</option>
-          <option value="Mace">Mace</option>
-          <option value="Throwing Knives">Throwing Knives</option>
-          <option value="Hand to Hand">Hand to Hand</option>
-          <option value="No Weapon">No Weapon</option>
+      <label>
+        Name:
+        <input type="text" id="tribute-name" required />
+      </label>
+      <label>
+        Gender:
+        <select id="tribute-gender" required>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
         </select>
       </label>
+      <label>
+        Age:
+        <input type="number" id="tribute-age" min="12" max="18" value="16" required />
+      </label>
+      <label>
+        District:
+        <select id="tribute-district" required>
+          <!-- District options inserted by JS -->
+        </select>
+      </label>
+      <label>
+        Weapon:
+        <select id="tribute-weapon" required>
+          <!-- Weapon options inserted by JS -->
+        </select>
+      </label>
+      <fieldset>
+        <legend>Skills (0-10)</legend>
+        <label>Combat: <input type="number" id="skill-combat" min="0" max="10" value="5" required /></label>
+        <label>Survival: <input type="number" id="skill-survival" min="0" max="10" value="5" required /></label>
+        <label>Stealth: <input type="number" id="skill-stealth" min="0" max="10" value="5" required /></label>
+        <label>Speed: <input type="number" id="skill-speed" min="0" max="10" value="5" required /></label>
+        <label>Strength: <input type="number" id="skill-strength" min="0" max="10" value="5" required /></label>
+        <label>Intelligence: <input type="number" id="skill-intelligence" min="0" max="10" value="5" required /></label>
+      </fieldset>
+      <p><strong>Training Score:</strong> <span id="training-score">30</span></p>
 
-      <div class="stat-buttons">
-        <button type="button" onclick="randomizeStats()">🎲 Randomize Stats + Age</button>
-        <button type="button" onclick="randomizeWeapon()">🎯 Randomize Weapon</button>
-        <button type="button" onclick="addTribute()">➕ Add Tribute</button>
+      <div class="buttons">
+        <button type="button" id="randomize-btn">Randomize</button>
+        <button type="submit">Add Tribute</button>
       </div>
     </form>
+  </section>
 
-    <button onclick="startSimulation()">▶️ Start Simulation</button>
+  <section id="simulation-controls">
+    <button id="start-simulation-btn">Start Simulation</button>
+    <button id="reset-btn" disabled>Reset</button>
+    <button id="download-log-btn" disabled>Download Log</button>
+  </section>
 
+  <section id="event-log">
     <h2>Event Log</h2>
-    <pre id="event-log"></pre>
-
-    <button id="download-log" onclick="downloadLog()">📥 Download Log</button>
-    <button id="restart" onclick="restartGame()">🔁 Restart</button>
-  </div>
+    <div id="log"></div>
+  </section>
 
   <script src="script.js"></script>
 </body>
