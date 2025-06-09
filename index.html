@@ -1,90 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hunger Games Simulator</title>
-<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>🍿 Hunger Games Simulator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1>🥇 Hunger Games Simulator</h1>
 
-<header>
-  <h1>Hunger Games Simulator</h1>
-</header>
-
-<section id="districts-container">
-  <h2>Districts & Tributes</h2>
-  <div id="districts-list">
-    <!-- Filled dynamically -->
+  <div class="controls">
+    <button id="randomizeBtn">🎲 Random Tribute</button>
+    <button id="startSimBtn">▶️ Start Simulation</button>
+    <button id="resetBtn" disabled>🔄 Reset</button>
+    <button id="downloadLogBtn" disabled>📥 Download Log</button>
   </div>
-</section>
 
-<section id="create-tribute">
-  <h2>Create Tribute</h2>
-  <form id="tribute-form">
-    <label>
-      Name: <input type="text" id="name" required />
-    </label>
-    <label>
-      Gender:
-      <select id="gender" required>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-      </select>
-    </label>
-    <label>
-      Age: <input type="number" id="age" min="12" max="18" value="16" required />
-    </label>
-    <label>
-      District:
-      <select id="district" required>
-        <!-- Options added by JS -->
-      </select>
-    </label>
-    <label>
-      Weapon:
-      <select id="weapon" required>
-        <option value="Knife">Knife</option>
-        <option value="Bow">Bow</option>
-        <option value="Spear">Spear</option>
-        <option value="Axe">Axe</option>
-        <option value="Sword">Sword</option>
-        <option value="Trident">Trident</option>
-        <option value="Mace">Mace</option>
-        <option value="Hammer">Hammer</option>
-        <option value="Slingshot">Slingshot</option>
-      </select>
-    </label>
-
-    <fieldset>
-      <legend>Skills (0-10)</legend>
-      <label>Combat: <input type="number" id="combat" min="0" max="10" value="5" required /></label>
-      <label>Survival: <input type="number" id="survival" min="0" max="10" value="5" required /></label>
-      <label>Stealth: <input type="number" id="stealth" min="0" max="10" value="5" required /></label>
-      <label>Speed: <input type="number" id="speed" min="0" max="10" value="5" required /></label>
-      <label>Strength: <input type="number" id="strength" min="0" max="10" value="5" required /></label>
-      <label>Intelligence: <input type="number" id="intelligence" min="0" max="10" value="5" required /></label>
-    </fieldset>
-
-    <div class="buttons">
-      <button type="button" id="randomize-btn">Randomize</button>
-      <button type="submit">Add Tribute</button>
+  <div class="tribute-form">
+    <input type="text" id="name" placeholder="Name">
+    <select id="gender">
+      <option value="male">♂️ Male</option>
+      <option value="female">♀️ Female</option>
+    </select>
+    <input type="number" id="age" placeholder="Age" min="12" max="18">
+    <input type="number" id="district" placeholder="District (1-12)" min="1" max="12">
+    <input type="text" id="weapon" placeholder="Weapon">
+    <div class="skills">
+      <input type="number" id="combat" placeholder="Combat" min="1" max="10">
+      <input type="number" id="survival" placeholder="Survival" min="1" max="10">
+      <input type="number" id="stealth" placeholder="Stealth" min="1" max="10">
+      <input type="number" id="speed" placeholder="Speed" min="1" max="10">
+      <input type="number" id="strength" placeholder="Strength" min="1" max="10">
+      <input type="number" id="intelligence" placeholder="Intelligence" min="1" max="10">
     </div>
-  </form>
-</section>
+    <button id="createBtn">➕ Add Tribute</button>
+  </div>
 
-<section id="simulation-controls">
-  <button id="start-sim-btn">Start Simulation</button>
-  <button id="reset-btn" disabled>Reset Simulation</button>
-  <button id="download-log-btn" disabled>Download Log</button>
-</section>
+  <div id="tributeList" class="tribute-list"></div>
+  <pre id="eventLog" class="event-log"></pre>
 
-<section id="event-log-section">
-  <h2>Event Log</h2>
-  <div id="event-log"></div>
-</section>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
