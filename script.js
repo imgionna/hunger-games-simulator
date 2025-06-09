@@ -135,16 +135,7 @@ function simulateDay() {
       const [a, b] = selectCombatPair();
       if (!a || !b) break;
 
-      function getCombatWinner(a, b) {
-  const aScore = a.trainingScore;
-  const bScore = b.trainingScore;
-
-  // Roll a random number from 0 to score + 5
-  const aRoll = Math.random() * (aScore + 5);
-  const bRoll = Math.random() * (bScore + 5);
-
-  return aRoll >= bRoll ? a : b;
-}
+      const winner = a.trainingScore + Math.random() * 5 > b.trainingScore + Math.random() * 5 ? a : b;
       const loser = winner === a ? b : a;
       tributeDies(loser);
       logEvent(`🩸 ${bold(winner)} strikes down ${bold(loser)} with a ${winner.weapon}!`);
@@ -161,16 +152,7 @@ function simulateDay() {
     const [a, b] = selectCombatPair();
     if (!a || !b) return;
 
-    function getCombatWinner(a, b) {
-  const aScore = a.trainingScore;
-  const bScore = b.trainingScore;
-
-  // Roll a random number from 0 to score + 5
-  const aRoll = Math.random() * (aScore + 5);
-  const bRoll = Math.random() * (bScore + 5);
-
-  return aRoll >= bRoll ? a : b;
-}
+    const winner = a.trainingScore + Math.random() * 5 > b.trainingScore + Math.random() * 5 ? a : b;
     const loser = winner === a ? b : a;
     tributeDies(loser);
     logEvent(`⚔️ ${bold(winner)} defeats ${bold(loser)} in a surprise attack.`);
@@ -182,16 +164,7 @@ function simulateDay() {
   logEvent(`\n🌙 <b>Night ${dayCount}</b>`);
   if (Math.random() < 0.4 && aliveTributes.length > 1) {
     const [a, b] = selectCombatPair();
-    function getCombatWinner(a, b) {
-  const aScore = a.trainingScore;
-  const bScore = b.trainingScore;
-
-  // Roll a random number from 0 to score + 5
-  const aRoll = Math.random() * (aScore + 5);
-  const bRoll = Math.random() * (bScore + 5);
-
-  return aRoll >= bRoll ? a : b;
-}
+    const winner = a.trainingScore + Math.random() * 5 > b.trainingScore + Math.random() * 5 ? a : b;
     const loser = winner === a ? b : a;
     tributeDies(loser);
     logEvent(`🌌 Under the stars, ${bold(winner)} ambushes ${bold(loser)} in their sleep.`);
