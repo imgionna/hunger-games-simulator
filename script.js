@@ -1,3 +1,4 @@
+// Global variables and elements
 const startSimBtn = document.getElementById("startSimBtn");
 const resetBtn = document.getElementById("resetBtn");
 const downloadLogBtn = document.getElementById("downloadLogBtn");
@@ -12,7 +13,9 @@ let fallenTributes = [];
 let eventLog = [];
 let dayCount = 0;
 let simulationRunning = false;
+let alliances = [];
 
+// Utilities
 function logEvent(text) {
   eventLog.push(text);
   eventLogElem.innerHTML = eventLog.join("<br>");
@@ -26,23 +29,20 @@ function roundUpAvg(...values) {
   return Math.ceil(values.reduce((a, b) => a + b, 0) / values.length);
 }
 
+function shuffle(arr) {
+  return arr.sort(() => 0.5 - Math.random());
+}
+
 function renderTributeList() {
   tributeList.innerHTML = tributes.map(t =>
     `${t.name} (${t.gender}, Age ${t.age}, D${t.district}, Weapon: ${t.weapon}, Score: ${t.trainingScore})`
   ).join("<br>");
 }
 
-function resetSimulation() {
-  tributes = [];
-  aliveTributes = [];
-  fallenTributes = [];
-  eventLog = [];
-  dayCount = 0;
-  simulationRunning = false;
-  eventLogElem.innerHTML = "";
-  renderTributeList();
-  resetBtn.disabled = true;
-  downloadLogBtn.disabled = true;
+// Tribute handling
+function tributeDies(victim) {
+  aliveTributes = aliveTributes.filter(t => t !== victim);
+  fallenTributes.push(victim);
 }
 
 function randomWeapon() {
@@ -51,17 +51,19 @@ function randomWeapon() {
 }
 
 function randomSkill() {
-  return Math.floor(Math.random() * 13); // 0–12
+  return Math.floor(Math.random() * 13);
 }
 
+// Randomize form
 randomizeBtn.addEventListener("click", () => {
-  document.getElementById("age").value = Math.floor(Math.random() * 8) + 12; // 12–19
+  document.getElementById("age").value = Math.floor(Math.random() * 8) + 12;
   document.getElementById("weapon").value = randomWeapon();
   ["combat", "survival", "stealth", "speed", "strength", "intelligence"].forEach(id => {
     document.getElementById(id).value = randomSkill();
   });
 });
 
+// Create tribute
 createBtn.addEventListener("click", () => {
   const name = document.getElementById("name").value;
   const gender = document.getElementById("gender").value;
@@ -76,35 +78,37 @@ createBtn.addEventListener("click", () => {
   }
 
   const trainingScore = roundUpAvg(...skills);
-  const tribute = { name, gender, age, district, weapon, trainingScore };
+  const tribute = { name, gender, age, district, weapon, trainingScore, kills: 0 };
   tributes.push(tribute);
   renderTributeList();
 });
 
-function tributeDies(victim) {
-  aliveTributes = aliveTributes.filter(t => t !== victim);
-  fallenTributes.push(victim);
-}
-
-function selectCombatPair() {
-  const shuffled = [...aliveTributes].sort(() => 0.5 - Math.random());
-
-  for (let i = 0; i < shuffled.length; i++) {
-    let a = shuffled[i];
-    for (let j = i + 1; j < shuffled.length; j++) {
-      let b = shuffled[j];
-      if (a.district !== b.district) return [a, b]; // Prefer different districts
-    }
-  }
-
-  // fallback — allow same district
-  return [shuffled[0], shuffled[1]];
+// Combat logic
+function getCombatEvent(actor, target) {
+  const templates = [
+    `🗡️ ${bold(actor)} ambushed ${bold(target)} with a ${actor.weapon}.`,
+    `🏹 ${bold(actor)} sniped ${bold(target)} from a distance.`,
+    `⚔️ ${bold(actor)} dueled ${bold(target)} at the riverbank.`,
+    `🔪 ${bold(actor)} crept up and slit the throat of ${bold(target)}.`,
+    `🔥 ${bold(actor)} set a trap that caught ${bold(target)}.`,
+  ];
+  return templates[Math.floor(Math.random() * templates.length)];
 }
 
 function getCombatWinner(a, b) {
   const aRoll = Math.random() * (a.trainingScore + 5);
   const bRoll = Math.random() * (b.trainingScore + 5);
   return aRoll >= bRoll ? a : b;
+}
+
+function selectCombatPair() {
+  const shuffled = shuffle([...aliveTributes]);
+  for (let i = 0; i < shuffled.length; i++) {
+    for (let j = i + 1; j < shuffled.length; j++) {
+      if (shuffled[i].district !== shuffled[j].district) return [shuffled[i], shuffled[j]];
+    }
+  }
+  return [shuffled[0], shuffled[1]];
 }
 
 function simulateFallenTributes() {
@@ -126,66 +130,63 @@ function randomTribute(exclude = null) {
   return options[Math.floor(Math.random() * options.length)];
 }
 
-function shuffle(arr) {
-  return arr.sort(() => 0.5 - Math.random());
-}
-
+// Arena Events
 function simulateArenaEvent() {
-  const eventType = Math.random();
+  const type = Math.floor(Math.random() * 4);
 
-  if (eventType < 0.33) {
-    logEvent(`🐺 Mutts are released into the arena!`);
-    const victim = randomTribute();
-    const attacker = randomTribute(victim);
-    const winner = getCombatWinner(victim, attacker);
-    const loser = winner === victim ? attacker : victim;
-    if (loser) {
-      tributeDies(loser);
-      logEvent(`🩸 ${bold(loser)} was mauled by mutts while ${bold(winner)} escaped!`);
-    }
-  } else if (eventType < 0.66) {
-    logEvent(`🌪️ A sudden storm lashes the arena.`);
-    const affected = randomTribute();
-    const survived = Math.random() < affected.trainingScore / 20;
-    if (!survived) {
-      tributeDies(affected);
-      logEvent(`⚡ ${bold(affected)} was crushed by debris during the storm.`);
+  if (type === 0) {
+    logEvent("🐺 Mutts are unleashed in the arena!");
+    const t = randomTribute();
+    if (Math.random() < t.survival / 15) {
+      logEvent(`🦴 ${bold(t)} escaped the mutts by climbing a tree.`);
     } else {
-      logEvent(`☔ ${bold(affected)} found shelter in time.`);
+      tributeDies(t);
+      logEvent(`🩸 ${bold(t)} was mauled by the mutts.`);
     }
-  } else {
-    logEvent(`🍖 A feast is announced at the Cornucopia! Supplies await...`);
-    const tribs = shuffle([...aliveTributes]).slice(0, 4);
-
+  } else if (type === 1) {
+    logEvent("🌪️ A violent storm crashes through!");
+    const t = randomTribute();
+    if (Math.random() < t.intelligence / 15) {
+      logEvent(`☔ ${bold(t)} found cover in time.`);
+    } else {
+      tributeDies(t);
+      logEvent(`⚡ ${bold(t)} was crushed by debris.`);
+    }
+  } else if (type === 2) {
+    logEvent("🍖 A feast is announced!");
+    const tribs = shuffle(aliveTributes).slice(0, 4);
     if (tribs.length >= 2) {
       const [a, b] = [tribs[0], tribs[1]];
       const winner = getCombatWinner(a, b);
       const loser = winner === a ? b : a;
+      winner.kills++;
       tributeDies(loser);
-      logEvent(`🥩 ${bold(winner)} kills ${bold(loser)} in a feast skirmish!`);
+      logEvent(`🥩 ${getCombatEvent(winner, loser)}`);
     }
-
-    tribs.slice(2).forEach(t => {
-      if (Math.random() < 0.5) {
-        logEvent(`🍞 ${bold(t)} sneaks in and grabs supplies!`);
-      } else {
-        logEvent(`🚫 ${bold(t)} hesitates and leaves empty-handed.`);
-      }
-    });
+  } else {
+    logEvent("☠️ Poison fog rolls across the field!");
+    const t = randomTribute();
+    if (Math.random() < t.intelligence / 20) {
+      logEvent(`🌫️ ${bold(t)} held their breath and survived.`);
+    } else {
+      tributeDies(t);
+      logEvent(`☠️ ${bold(t)} inhaled the poison and died.`);
+    }
   }
 }
 
+// Simulation
 function simulateDay() {
   if (dayCount === 0) {
     logEvent(`<b>🌅 The Bloodbath Begins!</b>`);
     const initialKills = Math.min(6, Math.floor(aliveTributes.length / 3));
     for (let i = 0; i < initialKills; i++) {
       const [a, b] = selectCombatPair();
-      if (!a || !b) break;
       const winner = getCombatWinner(a, b);
       const loser = winner === a ? b : a;
+      winner.kills++;
       tributeDies(loser);
-      logEvent(`🩸 ${bold(winner)} strikes down ${bold(loser)} with a ${winner.weapon}!`);
+      logEvent(`🩸 ${getCombatEvent(winner, loser)}`);
     }
     dayCount++;
     setTimeout(simulateDay, 2500);
@@ -193,28 +194,36 @@ function simulateDay() {
   }
 
   logEvent(`\n☀️ <b>Day ${dayCount}</b>`);
-  simulateArenaEvent();
 
-  if (aliveTributes.length > 1 && Math.random() < 0.6) {
+  if (Math.random() < 0.5) simulateArenaEvent();
+
+  if (Math.random() < 0.6 && aliveTributes.length > 1) {
     const [a, b] = selectCombatPair();
     const winner = getCombatWinner(a, b);
     const loser = winner === a ? b : a;
+    winner.kills++;
     tributeDies(loser);
-    logEvent(`⚔️ ${bold(winner)} defeats ${bold(loser)} in a surprise attack.`);
+    logEvent(`⚔️ ${getCombatEvent(winner, loser)}`);
   } else {
     const survivor = randomTribute();
-    logEvent(`🍂 ${bold(survivor)} spends the day hiding in the trees.`);
+    const outcome = Math.random();
+    if (outcome < 0.5) {
+      logEvent(`🫥 ${bold(survivor)} avoided danger using stealth.`);
+    } else {
+      logEvent(`⛺ ${bold(survivor)} crafted traps and survived the day.`);
+    }
   }
 
   logEvent(`\n🌙 <b>Night ${dayCount}</b>`);
-  if (Math.random() < 0.4 && aliveTributes.length > 1) {
+  if (Math.random() < 0.3 && aliveTributes.length > 1) {
     const [a, b] = selectCombatPair();
     const winner = getCombatWinner(a, b);
     const loser = winner === a ? b : a;
+    winner.kills++;
     tributeDies(loser);
-    logEvent(`🌌 Under the stars, ${bold(winner)} ambushes ${bold(loser)} in their sleep.`);
+    logEvent(`🌌 In the night, ${getCombatEvent(winner, loser)}`);
   } else {
-    logEvent(`🌜 The night passes quietly.`);
+    logEvent("🌜 Quiet settles over the arena.");
   }
 
   simulateFallenTributes();
@@ -224,11 +233,12 @@ function simulateDay() {
   if (aliveTributes.length <= 1) {
     const winner = aliveTributes[0];
     if (winner) {
-      logEvent(`\n🏆 <b>${winner.name} (D${winner.district})</b> is the Victor of the Hunger Games!`);
+      logEvent(`\n🏆 <b>${winner.name} (D${winner.district})</b> is the Victor!`);
     } else {
       logEvent(`\n💀 All tributes have perished. No victor emerges.`);
     }
 
+    showSummary();
     simulationRunning = false;
     startSimBtn.disabled = false;
     resetBtn.disabled = false;
@@ -239,10 +249,26 @@ function simulateDay() {
   setTimeout(simulateDay, 4000);
 }
 
+function showSummary() {
+  const placements = [...tributes].sort((a, b) => {
+    const aDead = fallenTributes.includes(a);
+    const bDead = fallenTributes.includes(b);
+    if (aDead && bDead) return fallenTributes.indexOf(a) - fallenTributes.indexOf(b);
+    return aDead ? 1 : -1;
+  });
+
+  logEvent(`<br><b>📊 Final Standings:</b>`);
+  placements.forEach((t, i) => {
+    const place = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}th`;
+    logEvent(`${place}: ${t.name} (D${t.district}) — 💀 ${t.kills} kill${t.kills !== 1 ? "s" : ""}`);
+  });
+}
+
+// Start & Reset
 startSimBtn.addEventListener("click", () => {
   if (tributes.length < 2) return alert("Need at least 2 tributes to start.");
 
-  aliveTributes = tributes.slice();
+  aliveTributes = tributes.map(t => ({ ...t, kills: 0 }));
   fallenTributes = [];
   eventLog = [];
   dayCount = 0;
@@ -253,7 +279,18 @@ startSimBtn.addEventListener("click", () => {
   simulateDay();
 });
 
-resetBtn.addEventListener("click", resetSimulation);
+resetBtn.addEventListener("click", () => {
+  tributes = [];
+  aliveTributes = [];
+  fallenTributes = [];
+  eventLog = [];
+  dayCount = 0;
+  alliances = [];
+  eventLogElem.innerHTML = "";
+  renderTributeList();
+  resetBtn.disabled = true;
+  downloadLogBtn.disabled = true;
+});
 
 downloadLogBtn.addEventListener("click", () => {
   const blob = new Blob([eventLog.join("\n").replace(/<[^>]*>/g, '')], { type: "text/plain" });
@@ -264,5 +301,3 @@ downloadLogBtn.addEventListener("click", () => {
   a.click();
   URL.revokeObjectURL(url);
 });
-
-resetSimulation();
