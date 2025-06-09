@@ -13,18 +13,23 @@
     <form id="tribute-form">
       <input id="name" placeholder="Name" />
       <button type="button" onclick="randomizeName()">🎲 Random Name</button>
+
       <input id="district" placeholder="District (1–12)" type="number" min="1" max="12"/>
+      
       <select id="gender">
         <option value="Male">Male</option>
         <option value="Female">Female</option>
       </select>
+
       <input id="age" type="number" min="12" max="18" placeholder="Age (12–18)" />
+
       <label>Combat: <input type="number" id="combat" min="1" max="10" /></label>
       <label>Survival: <input type="number" id="survival" min="1" max="10" /></label>
       <label>Stealth: <input type="number" id="stealth" min="1" max="10" /></label>
       <label>Speed: <input type="number" id="speed" min="1" max="10" /></label>
       <label>Strength: <input type="number" id="strength" min="1" max="10" /></label>
       <label>Intelligence: <input type="number" id="intelligence" min="1" max="10" /></label>
+
       <label>Weapon:
         <select id="weapon">
           <option value="Bow">Bow</option>
