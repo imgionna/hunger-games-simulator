@@ -8,13 +8,18 @@ const eventLogElem = document.getElementById("eventLog");
 
 let tributes = [];
 let aliveTributes = [];
+let fallenTributes = [];
 let eventLog = [];
 let dayCount = 0;
 let simulationRunning = false;
 
 function logEvent(text) {
   eventLog.push(text);
-  eventLogElem.textContent = eventLog.join("\n");
+  eventLogElem.innerHTML = eventLog.join("<br>");
+}
+
+function bold(t) {
+  return `**${t.name} (D${t.district})**`;
 }
 
 function roundUpAvg(...values) {
@@ -23,17 +28,18 @@ function roundUpAvg(...values) {
 
 function renderTributeList() {
   tributeList.innerHTML = tributes.map(t =>
-    `${t.name} (${t.gender}, D<b>${t.district}</b>, Weapon: ${t.weapon}, Score: ${t.trainingScore})`
+    `${t.name} (${t.gender}, D${t.district}, Weapon: ${t.weapon}, Score: ${t.trainingScore})`
   ).join("<br>");
 }
 
 function resetSimulation() {
   tributes = [];
   aliveTributes = [];
+  fallenTributes = [];
   eventLog = [];
   dayCount = 0;
   simulationRunning = false;
-  eventLogElem.textContent = "";
+  eventLogElem.innerHTML = "";
   renderTributeList();
   resetBtn.disabled = true;
   downloadLogBtn.disabled = true;
@@ -45,7 +51,7 @@ function randomWeapon() {
 }
 
 function randomSkill() {
-  return Math.floor(Math.random() * 10) + 1;
+  return Math.floor(Math.random() * 13); // 0–12
 }
 
 randomizeBtn.addEventListener("click", () => {
@@ -62,7 +68,7 @@ createBtn.addEventListener("click", () => {
   const district = parseInt(document.getElementById("district").value);
   const weapon = document.getElementById("weapon").value;
   const skills = ["combat", "survival", "stealth", "speed", "strength", "intelligence"].map(id => parseInt(document.getElementById(id).value));
-  
+
   if (!name || !age || !district || !weapon || skills.some(s => isNaN(s))) {
     alert("Please fill out all fields.");
     return;
@@ -70,13 +76,13 @@ createBtn.addEventListener("click", () => {
 
   const trainingScore = roundUpAvg(...skills);
   const tribute = { name, gender, age, district, weapon, trainingScore };
-
   tributes.push(tribute);
   renderTributeList();
 });
 
 function tributeDies(victim) {
   aliveTributes = aliveTributes.filter(t => t !== victim);
+  fallenTributes.push(victim);
 }
 
 function selectRandomTribute(exclude) {
@@ -84,11 +90,51 @@ function selectRandomTribute(exclude) {
   return options[Math.floor(Math.random() * options.length)];
 }
 
-function simulateDay() {
-  dayCount++;
-  logEvent(`\n🌞 Day ${dayCount}`);
+function simulateFallenTributes() {
+  if (fallenTributes.length === 0) {
+    logEvent(`🌌 No tributes fell tonight.`);
+    return;
+  }
 
-  if (aliveTributes.length > 1 && Math.random() < 0.7) {
+  logEvent(`\n💀 <b>Fallen Tributes:</b>`);
+  fallenTributes.forEach(t => {
+    logEvent(`🔔 ${t.name} (D${t.district}) — 💫`);
+  });
+
+  fallenTributes = [];
+}
+
+function simulateArenaEvent() {
+  if (Math.random() < 0.3) {
+    logEvent(`🌪️ A sudden storm ravages the arena! Everyone scrambles for cover.`);
+  } else if (Math.random() < 0.2) {
+    logEvent(`🐻 Mutts are released into the arena, causing chaos!`);
+  }
+}
+
+function simulateDay() {
+  if (dayCount === 0) {
+    logEvent(`<b>🌅 The Bloodbath Begins!</b>`);
+    const initialKills = Math.min(6, Math.floor(aliveTributes.length / 3));
+    for (let i = 0; i < initialKills; i++) {
+      const a = selectRandomTribute();
+      const b = selectRandomTribute(a);
+      if (!a || !b) break;
+
+      const winner = a.trainingScore + Math.random() * 5 > b.trainingScore + Math.random() * 5 ? a : b;
+      const loser = winner === a ? b : a;
+      tributeDies(loser);
+      logEvent(`🩸 ${bold(winner)} strikes down ${bold(loser)} with a ${winner.weapon}!`);
+    }
+    dayCount++;
+    setTimeout(simulateDay, 2500);
+    return;
+  }
+
+  logEvent(`\n☀️ <b>Day ${dayCount}</b>`);
+  simulateArenaEvent();
+
+  if (aliveTributes.length > 1 && Math.random() < 0.6) {
     const a = selectRandomTribute();
     const b = selectRandomTribute(a);
     if (!a || !b) return;
@@ -96,17 +142,36 @@ function simulateDay() {
     const winner = a.trainingScore + Math.random() * 5 > b.trainingScore + Math.random() * 5 ? a : b;
     const loser = winner === a ? b : a;
     tributeDies(loser);
-
-    logEvent(`⚔️ ${winner.name} (D<b>${winner.district}</b>) eliminated ${loser.name} (D<b>${loser.district}</b>) with a ${winner.weapon}.`);
+    logEvent(`⚔️ ${bold(winner)} defeats ${bold(loser)} in a surprise attack.`);
   } else {
-    aliveTributes.forEach(t => {
-      logEvent(`🍃 ${t.name} (D<b>${t.district}</b>) survived the day by staying hidden.`);
-    });
+    const survivor = aliveTributes[Math.floor(Math.random() * aliveTributes.length)];
+    logEvent(`🍂 ${bold(survivor)} spends the day hiding in the trees.`);
   }
+
+  logEvent(`\n🌙 <b>Night ${dayCount}</b>`);
+  if (Math.random() < 0.4 && aliveTributes.length > 1) {
+    const a = selectRandomTribute();
+    const b = selectRandomTribute(a);
+    const winner = a.trainingScore + Math.random() * 5 > b.trainingScore + Math.random() * 5 ? a : b;
+    const loser = winner === a ? b : a;
+    tributeDies(loser);
+    logEvent(`🌌 Under the stars, ${bold(winner)} ambushes ${bold(loser)} in their sleep.`);
+  } else {
+    logEvent(`🌜 The night passes quietly.`);
+  }
+
+  simulateFallenTributes();
+
+  dayCount++;
 
   if (aliveTributes.length <= 1) {
     const winner = aliveTributes[0];
-    logEvent(winner ? `🏆 ${winner.name} (D<b>${winner.district}</b>) is the Victor!` : `☠️ No one survived...`);
+    if (winner) {
+      logEvent(`\n🏆 <b>${winner.name} (D${winner.district})</b> is the Victor of the Hunger Games!`);
+    } else {
+      logEvent(`\n💀 All tributes have perished. No victor emerges.`);
+    }
+
     simulationRunning = false;
     startSimBtn.disabled = false;
     resetBtn.disabled = false;
@@ -114,17 +179,18 @@ function simulateDay() {
     return;
   }
 
-  setTimeout(simulateDay, 2000);
+  setTimeout(simulateDay, 4000);
 }
 
 startSimBtn.addEventListener("click", () => {
   if (tributes.length < 2) return alert("Need at least 2 tributes to start.");
 
   aliveTributes = tributes.slice();
-  simulationRunning = true;
+  fallenTributes = [];
   eventLog = [];
   dayCount = 0;
-  eventLogElem.textContent = "";
+  eventLogElem.innerHTML = "";
+  simulationRunning = true;
   startSimBtn.disabled = true;
   resetBtn.disabled = false;
   simulateDay();
@@ -133,7 +199,7 @@ startSimBtn.addEventListener("click", () => {
 resetBtn.addEventListener("click", resetSimulation);
 
 downloadLogBtn.addEventListener("click", () => {
-  const blob = new Blob([eventLog.join("\n")], { type: "text/plain" });
+  const blob = new Blob([eventLog.join("\n").replace(/<[^>]*>/g, '')], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
