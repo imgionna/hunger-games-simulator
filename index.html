@@ -1,42 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>🍿 Hunger Games Simulator</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hunger Games Simulator</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>🥇 Hunger Games Simulator</h1>
+  <h1>Hunger Games Simulator 🍿</h1>
 
-  <div class="controls">
-    <button id="randomizeBtn">🎲 Random Tribute</button>
-    <button id="startSimBtn">▶️ Start Simulation</button>
-    <button id="resetBtn" disabled>🔄 Reset</button>
-    <button id="downloadLogBtn" disabled>📥 Download Simulation</button>
-  </div>
-
-  <div class="tribute-form">
-    <input type="text" id="name" placeholder="Name">
+  <section class="form-section">
+    <input type="text" id="name" placeholder="Name" />
     <select id="gender">
-      <option value="male">♂️ Male</option>
-      <option value="female">♀️ Female</option>
+      <option value="Male">♂️ Male</option>
+      <option value="Female">♀️ Female</option>
     </select>
-    <input type="number" id="age" placeholder="Age" min="12" max="18">
-    <input type="number" id="district" placeholder="District (1-12)" min="1" max="12">
-    <input type="text" id="weapon" placeholder="Weapon">
-    <div class="skills">
-      <input type="number" id="combat" placeholder="Combat" min="1" max="10">
-      <input type="number" id="survival" placeholder="Survival" min="1" max="10">
-      <input type="number" id="stealth" placeholder="Stealth" min="1" max="10">
-      <input type="number" id="speed" placeholder="Speed" min="1" max="10">
-      <input type="number" id="strength" placeholder="Strength" min="1" max="10">
-      <input type="number" id="intelligence" placeholder="Intelligence" min="1" max="10">
-    </div>
-    <button id="createBtn">➕ Add Tribute</button>
-  </div>
+    <input type="number" id="age" placeholder="Age" min="12" max="18" />
+    <input type="number" id="district" placeholder="District (1-12)" min="1" max="12" />
+    <input type="text" id="weapon" placeholder="Weapon" />
 
-  <div id="tributeList" class="tribute-list"></div>
-  <pre id="eventLog" class="event-log"></pre>
+    <div class="skills">
+      <input type="number" id="combat" placeholder="Combat (0-12)" min="0" max="12" />
+      <input type="number" id="survival" placeholder="Survival (0-12)" min="0" max="12" />
+      <input type="number" id="stealth" placeholder="Stealth (0-12)" min="0" max="12" />
+      <input type="number" id="speed" placeholder="Speed (0-12)" min="0" max="12" />
+      <input type="number" id="strength" placeholder="Strength (0-12)" min="0" max="12" />
+      <input type="number" id="intelligence" placeholder="Intelligence (0-12)" min="0" max="12" />
+    </div>
+
+    <div class="buttons">
+      <button id="randomizeBtn">🎲 Randomize</button>
+      <button id="createBtn">➕ Add Tribute</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Tributes 👥</h2>
+    <div id="tributeList" class="tribute-list"></div>
+  </section>
+
+  <section>
+    <button id="startSimBtn">🚀 Start Simulation</button>
+    <button id="resetBtn" disabled>🔄 Reset</button>
+    <button id="downloadLogBtn" disabled>💾 Download Log</button>
+  </section>
+
+  <section>
+    <h2>Event Log 📜</h2>
+    <div id="eventLog" class="event-log"></div>
+  </section>
 
   <script src="script.js"></script>
 </body>
