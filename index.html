@@ -1,80 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hunger Games Simulator</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hunger Games Simulator</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>Hunger Games Simulator</h1>
-  </header>
 
-  <section id="district-roster">
-    <h2>Districts & Tributes</h2>
-    <div id="districts-container"></div>
-  </section>
+<header>
+  <h1>Hunger Games Simulator</h1>
+</header>
 
-  <section id="tribute-creation">
-    <h2>Create Tribute</h2>
-    <form id="tribute-form">
-      <label>
-        Name:
-        <input type="text" id="tribute-name" required />
-      </label>
-      <label>
-        Gender:
-        <select id="tribute-gender" required>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </select>
-      </label>
-      <label>
-        Age:
-        <input type="number" id="tribute-age" min="12" max="18" value="16" required />
-      </label>
-      <label>
-        District:
-        <select id="tribute-district" required>
-          <!-- District options inserted by JS -->
-        </select>
-      </label>
-      <label>
-        Weapon:
-        <select id="tribute-weapon" required>
-          <!-- Weapon options inserted by JS -->
-        </select>
-      </label>
-      <fieldset>
-        <legend>Skills (0-10)</legend>
-        <label>Combat: <input type="number" id="skill-combat" min="0" max="10" value="5" required /></label>
-        <label>Survival: <input type="number" id="skill-survival" min="0" max="10" value="5" required /></label>
-        <label>Stealth: <input type="number" id="skill-stealth" min="0" max="10" value="5" required /></label>
-        <label>Speed: <input type="number" id="skill-speed" min="0" max="10" value="5" required /></label>
-        <label>Strength: <input type="number" id="skill-strength" min="0" max="10" value="5" required /></label>
-        <label>Intelligence: <input type="number" id="skill-intelligence" min="0" max="10" value="5" required /></label>
-      </fieldset>
-      <p><strong>Training Score:</strong> <span id="training-score">30</span></p>
+<section id="districts-container">
+  <h2>Districts & Tributes</h2>
+  <div id="districts-list">
+    <!-- Filled dynamically -->
+  </div>
+</section>
 
-      <div class="buttons">
-        <button type="button" id="randomize-btn">Randomize</button>
-        <button type="submit">Add Tribute</button>
-      </div>
-    </form>
-  </section>
+<section id="create-tribute">
+  <h2>Create Tribute</h2>
+  <form id="tribute-form">
+    <label>
+      Name: <input type="text" id="name" required />
+    </label>
+    <label>
+      Gender:
+      <select id="gender" required>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </label>
+    <label>
+      Age: <input type="number" id="age" min="12" max="18" value="16" required />
+    </label>
+    <label>
+      District:
+      <select id="district" required>
+        <!-- Options added by JS -->
+      </select>
+    </label>
+    <label>
+      Weapon:
+      <select id="weapon" required>
+        <option value="Knife">Knife</option>
+        <option value="Bow">Bow</option>
+        <option value="Spear">Spear</option>
+        <option value="Axe">Axe</option>
+        <option value="Sword">Sword</option>
+        <option value="Trident">Trident</option>
+        <option value="Mace">Mace</option>
+        <option value="Hammer">Hammer</option>
+        <option value="Slingshot">Slingshot</option>
+      </select>
+    </label>
 
-  <section id="simulation-controls">
-    <button id="start-simulation-btn">Start Simulation</button>
-    <button id="reset-btn" disabled>Reset</button>
-    <button id="download-log-btn" disabled>Download Log</button>
-  </section>
+    <fieldset>
+      <legend>Skills (0-10)</legend>
+      <label>Combat: <input type="number" id="combat" min="0" max="10" value="5" required /></label>
+      <label>Survival: <input type="number" id="survival" min="0" max="10" value="5" required /></label>
+      <label>Stealth: <input type="number" id="stealth" min="0" max="10" value="5" required /></label>
+      <label>Speed: <input type="number" id="speed" min="0" max="10" value="5" required /></label>
+      <label>Strength: <input type="number" id="strength" min="0" max="10" value="5" required /></label>
+      <label>Intelligence: <input type="number" id="intelligence" min="0" max="10" value="5" required /></label>
+    </fieldset>
 
-  <section id="event-log">
-    <h2>Event Log</h2>
-    <div id="log"></div>
-  </section>
+    <div class="buttons">
+      <button type="button" id="randomize-btn">Randomize</button>
+      <button type="submit">Add Tribute</button>
+    </div>
+  </form>
+</section>
 
-  <script src="script.js"></script>
+<section id="simulation-controls">
+  <button id="start-sim-btn">Start Simulation</button>
+  <button id="reset-btn" disabled>Reset Simulation</button>
+  <button id="download-log-btn" disabled>Download Log</button>
+</section>
+
+<section id="event-log-section">
+  <h2>Event Log</h2>
+  <div id="event-log"></div>
+</section>
+
+<script src="script.js"></script>
+
 </body>
 </html>
