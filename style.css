@@ -1,96 +1,167 @@
+/* Reset */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
-  text-align: center;
-  background-color: #f8f4f9;
-  color: #333;
+  background: #f2f2f2;
+  color: #222;
   padding: 20px;
-  margin: 0;
 }
 
-h1 {
-  font-size: 2.2rem;
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  border-radius: 10px;
+  padding: 20px 30px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+  text-align: center;
   margin-bottom: 15px;
-  color: #ac2bac;
+  color: #2c3e50;
 }
 
-h2 {
-  margin-top: 30px;
-  color: #5d2078;
+.tribute-creator form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px 25px;
+  margin-bottom: 25px;
 }
 
-input, select, button {
-  padding: 8px;
-  margin: 5px;
+.tribute-creator label,
+.tribute-creator fieldset {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+fieldset {
+  grid-column: span 2;
+  border: 1px solid #ddd;
   border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
+  padding: 10px 15px;
 }
 
-input:focus, select:focus {
-  border-color: #a342b2;
+fieldset legend {
+  padding: 0 8px;
+  font-weight: 700;
+  color: #34495e;
+}
+
+fieldset label {
+  margin-top: 5px;
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  padding: 7px 8px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1.5px solid #aaa;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus,
+select:focus {
+  border-color: #2980b9;
   outline: none;
 }
 
-button {
-  background-color: #d278e6;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+.buttons {
+  grid-column: span 2;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
-button:hover {
-  background-color: #b659cc;
+button {
+  cursor: pointer;
+  background: #2980b9;
+  border: none;
+  color: white;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 10px 25px;
+  border-radius: 6px;
+  box-shadow: 0 3px 8px rgba(41, 128, 185, 0.5);
+  transition: background-color 0.25s ease;
+}
+
+button:hover:not(:disabled) {
+  background: #1f6391;
 }
 
 button:disabled {
-  background-color: #ccc;
+  background: #999;
   cursor: not-allowed;
 }
 
-.form-section {
-  margin: 20px auto;
-  max-width: 600px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.skills {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px;
-}
-
-.buttons {
-  width: 100%;
-  margin-top: 10px;
+.tributes-list,
+.simulation-controls,
+.log-section {
+  margin-top: 30px;
+  padding: 0 10px;
 }
 
 .tribute-list {
-  max-width: 800px;
-  margin: 0 auto;
-  text-align: center;
-  background-color: #fff;
-  padding: 15px;
+  min-height: 100px;
+  background: #ecf0f1;
   border-radius: 8px;
-  border: 1px solid #ddd;
-  font-family: monospace;
+  padding: 15px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #34495e;
+  white-space: pre-wrap;
+  line-height: 1.4;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
 }
 
-.event-log {
-  max-width: 900px;
-  margin: 0 auto;
-  background-color: #f0e6f7;
-  padding: 15px;
-  border-radius: 10px;
-  border: 1px solid #caa6e1;
+.game-log {
+  background: #111;
+  color: #eee;
+  font-family: monospace, monospace;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  padding: 20px;
+  max-height: 320px;
+  overflow-y: scroll;
   white-space: pre-wrap;
-  text-align: left;
-  font-family: "Courier New", Courier, monospace;
-  font-size: 14px;
+  line-height: 1.5;
+  border: 1px solid #555;
+}
+
+.simulation-controls {
+  text-align: center;
+}
+
+.simulation-controls button {
+  margin: 0 12px;
+  min-width: 130px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .tribute-creator form {
+    grid-template-columns: 1fr;
+  }
+  .buttons {
+    flex-direction: column;
+  }
+  .buttons button {
+    width: 100%;
+  }
 }
