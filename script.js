@@ -1,303 +1,292 @@
-// Global variables and elements
-const startSimBtn = document.getElementById("startSimBtn");
-const resetBtn = document.getElementById("resetBtn");
-const downloadLogBtn = document.getElementById("downloadLogBtn");
-const randomizeBtn = document.getElementById("randomizeBtn");
-const createBtn = document.getElementById("createBtn");
-const tributeList = document.getElementById("tributeList");
-const eventLogElem = document.getElementById("eventLog");
-
-let tributes = [];
-let aliveTributes = [];
-let fallenTributes = [];
-let eventLog = [];
+const tributes = [];
 let dayCount = 0;
-let simulationRunning = false;
-let alliances = [];
+let aliveTributes = [];
+let gameLog = "";
+let gameRunning = false;
+let fallenToday = [];
+let usedArenaEvents = [];
 
-// Utilities
-function logEvent(text) {
-  eventLog.push(text);
-  eventLogElem.innerHTML = eventLog.join("<br>");
+const weapons = ["knife", "spear", "bow", "axe", "slingshot", "rock"];
+const arenaEvents = [
+  { name: "Mutts", type: "combat" },
+  { name: "Acid Rain", type: "hazard" },
+  { name: "Feast", type: "feast" },
+  { name: "Firestorm", type: "hazard" },
+];
+
+const actions = {
+  bloodbath: [
+    "**${actor.name} (D${actor.district})** grabbed a ${actor.weapon} and struck down **${target.name} (D${target.district})**! 💥",
+    "**${target.name} (D${target.district})** was caught off guard by **${actor.name} (D${actor.district})** during the chaos. ⚔️",
+    "**${actor.name} (D${actor.district})** lunged with their ${actor.weapon} and eliminated **${target.name} (D${target.district})**. 🩸",
+  ],
+  kill: [
+    "**${actor.name} (D${actor.district})** ambushed and killed **${target.name} (D${target.district})**. 🔪",
+    "**${target.name} (D${target.district})** stood no chance against **${actor.name} (D${actor.district})**. 💀",
+    "**${actor.name} (D${actor.district})** overpowered **${target.name} (D${target.district})** in a brutal fight. ⚔️",
+  ],
+  survival: [
+    "**${actor.name} (D${actor.district})** avoided danger by hiding. 🫣",
+    "**${actor.name} (D${actor.district})** climbed a tree to stay safe. 🌲",
+    "**${actor.name} (D${actor.district})** managed to find shelter and survive. 🏕️",
+  ],
+  arena: {
+    Mutts: [
+      "**${actor.name} (D${actor.district})** was torn apart by mutts. 🐺",
+      "**${actor.name} (D${actor.district})** narrowly escaped the mutts. 🏃‍♂️",
+    ],
+    AcidRain: [
+      "**${actor.name} (D${actor.district})** was caught in the acid rain and succumbed. ☠️",
+      "**${actor.name} (D${actor.district})** found shelter just in time. ⛺",
+    ],
+    Firestorm: [
+      "**${actor.name} (D${actor.district})** was engulfed in the firestorm. 🔥",
+      "**${actor.name} (D${actor.district})** dodged the fire and survived. 😰",
+    ],
+    Feast: [
+      "**${actor.name} (D${actor.district})** killed **${target.name} (D${target.district})** during the Feast. 🍽️🩸",
+      "**${actor.name} (D${actor.district})** took supplies and escaped the Feast safely. 🎒",
+    ]
+  },
+};
+
+function addTribute(name, gender, age, district, weapon, skills) {
+  const training = Math.ceil((skills.combat + skills.survival + skills.stealth + skills.speed + skills.strength + skills.intelligence) / 6);
+  const tribute = {
+    name,
+    gender,
+    age,
+    district,
+    weapon,
+    skills,
+    training,
+    alive: true,
+    kills: 0,
+    placement: null,
+  };
+  tributes.push(tribute);
+  updateTributeDisplay();
 }
 
-function bold(t) {
-  return `**${t.name} (D${t.district})**`;
-}
-
-function roundUpAvg(...values) {
-  return Math.ceil(values.reduce((a, b) => a + b, 0) / values.length);
-}
-
-function shuffle(arr) {
-  return arr.sort(() => 0.5 - Math.random());
-}
-
-function renderTributeList() {
-  tributeList.innerHTML = tributes.map(t =>
-    `${t.name} (${t.gender}, Age ${t.age}, D${t.district}, Weapon: ${t.weapon}, Score: ${t.trainingScore})`
+function updateTributeDisplay() {
+  const list = document.getElementById("tributeList");
+  list.innerHTML = tributes.map(t => 
+    `${t.name} (D${t.district}) - ${t.gender}, Age ${t.age}, Training Score: ${t.training}`
   ).join("<br>");
 }
 
-// Tribute handling
-function tributeDies(victim) {
-  aliveTributes = aliveTributes.filter(t => t !== victim);
-  fallenTributes.push(victim);
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function randomWeapon() {
-  const weapons = ["spear", "sword", "bow", "axe", "knife", "rock", "mace", "whip"];
-  return weapons[Math.floor(Math.random() * weapons.length)];
+function randomFrom(array) {
+  return array[Math.floor(Math.random() * array.length)];
 }
 
-function randomSkill() {
-  return Math.floor(Math.random() * 13);
-}
-
-// Randomize form
-randomizeBtn.addEventListener("click", () => {
-  document.getElementById("age").value = Math.floor(Math.random() * 8) + 12;
-  document.getElementById("weapon").value = randomWeapon();
-  ["combat", "survival", "stealth", "speed", "strength", "intelligence"].forEach(id => {
-    document.getElementById(id).value = randomSkill();
+document.getElementById("randomizeBtn").addEventListener("click", () => {
+  document.getElementById("name").value = `Tribute${tributes.length + 1}`;
+  document.getElementById("gender").value = randomFrom(["Male", "Female"]);
+  document.getElementById("age").value = randomInt(12, 18);
+  document.getElementById("district").value = randomInt(1, 12);
+  document.getElementById("weapon").value = randomFrom(weapons);
+  ["combat", "survival", "stealth", "speed", "strength", "intelligence"].forEach(skill => {
+    document.getElementById(skill).value = randomInt(0, 12);
   });
 });
 
-// Create tribute
-createBtn.addEventListener("click", () => {
+document.getElementById("createBtn").addEventListener("click", () => {
   const name = document.getElementById("name").value;
   const gender = document.getElementById("gender").value;
   const age = parseInt(document.getElementById("age").value);
   const district = parseInt(document.getElementById("district").value);
   const weapon = document.getElementById("weapon").value;
-  const skills = ["combat", "survival", "stealth", "speed", "strength", "intelligence"].map(id => parseInt(document.getElementById(id).value));
+  const skills = {
+    combat: parseInt(document.getElementById("combat").value),
+    survival: parseInt(document.getElementById("survival").value),
+    stealth: parseInt(document.getElementById("stealth").value),
+    speed: parseInt(document.getElementById("speed").value),
+    strength: parseInt(document.getElementById("strength").value),
+    intelligence: parseInt(document.getElementById("intelligence").value)
+  };
 
-  if (!name || !age || !district || !weapon || skills.some(s => isNaN(s))) {
-    alert("Please fill out all fields.");
+  if (tributes.filter(t => t.district === district && t.gender === gender).length >= 1) {
+    alert("Each district can only have 1 male and 1 female tribute.");
     return;
   }
 
-  const trainingScore = roundUpAvg(...skills);
-  const tribute = { name, gender, age, district, weapon, trainingScore, kills: 0 };
-  tributes.push(tribute);
-  renderTributeList();
+  addTribute(name, gender, age, district, weapon, skills);
 });
 
-// Combat logic
-function getCombatEvent(actor, target) {
-  const templates = [
-    `🗡️ ${bold(actor)} ambushed ${bold(target)} with a ${actor.weapon}.`,
-    `🏹 ${bold(actor)} sniped ${bold(target)} from a distance.`,
-    `⚔️ ${bold(actor)} dueled ${bold(target)} at the riverbank.`,
-    `🔪 ${bold(actor)} crept up and slit the throat of ${bold(target)}.`,
-    `🔥 ${bold(actor)} set a trap that caught ${bold(target)}.`,
-  ];
-  return templates[Math.floor(Math.random() * templates.length)];
+document.getElementById("startSimBtn").addEventListener("click", () => {
+  if (tributes.length < 24) return alert("You need 24 tributes to begin the Games!");
+  gameRunning = true;
+  aliveTributes = [...tributes];
+  runBloodbath();
+});
+
+function runBloodbath() {
+  const count = randomInt(3, 8);
+  gameLog += `\n🌅 **The Bloodbath Begins** 🌅\n`;
+  processEvents(count, true);
+  endPhase("Bloodbath");
 }
 
-function getCombatWinner(a, b) {
-  const aRoll = Math.random() * (a.trainingScore + 5);
-  const bRoll = Math.random() * (b.trainingScore + 5);
-  return aRoll >= bRoll ? a : b;
-}
-
-function selectCombatPair() {
-  const shuffled = shuffle([...aliveTributes]);
-  for (let i = 0; i < shuffled.length; i++) {
-    for (let j = i + 1; j < shuffled.length; j++) {
-      if (shuffled[i].district !== shuffled[j].district) return [shuffled[i], shuffled[j]];
-    }
-  }
-  return [shuffled[0], shuffled[1]];
-}
-
-function simulateFallenTributes() {
-  if (fallenTributes.length === 0) {
-    logEvent(`🌌 No tributes fell tonight.`);
-    return;
-  }
-
-  logEvent(`\n💀 <b>Fallen Tributes:</b>`);
-  fallenTributes.forEach(t => {
-    logEvent(`🔔 ${t.name} (D${t.district}) — 💫`);
-  });
-
-  fallenTributes = [];
-}
-
-function randomTribute(exclude = null) {
-  const options = aliveTributes.filter(t => t !== exclude);
-  return options[Math.floor(Math.random() * options.length)];
-}
-
-// Arena Events
-function simulateArenaEvent() {
-  const type = Math.floor(Math.random() * 4);
-
-  if (type === 0) {
-    logEvent("🐺 Mutts are unleashed in the arena!");
-    const t = randomTribute();
-    if (Math.random() < t.survival / 15) {
-      logEvent(`🦴 ${bold(t)} escaped the mutts by climbing a tree.`);
-    } else {
-      tributeDies(t);
-      logEvent(`🩸 ${bold(t)} was mauled by the mutts.`);
-    }
-  } else if (type === 1) {
-    logEvent("🌪️ A violent storm crashes through!");
-    const t = randomTribute();
-    if (Math.random() < t.intelligence / 15) {
-      logEvent(`☔ ${bold(t)} found cover in time.`);
-    } else {
-      tributeDies(t);
-      logEvent(`⚡ ${bold(t)} was crushed by debris.`);
-    }
-  } else if (type === 2) {
-    logEvent("🍖 A feast is announced!");
-    const tribs = shuffle(aliveTributes).slice(0, 4);
-    if (tribs.length >= 2) {
-      const [a, b] = [tribs[0], tribs[1]];
-      const winner = getCombatWinner(a, b);
-      const loser = winner === a ? b : a;
-      winner.kills++;
-      tributeDies(loser);
-      logEvent(`🥩 ${getCombatEvent(winner, loser)}`);
-    }
-  } else {
-    logEvent("☠️ Poison fog rolls across the field!");
-    const t = randomTribute();
-    if (Math.random() < t.intelligence / 20) {
-      logEvent(`🌫️ ${bold(t)} held their breath and survived.`);
-    } else {
-      tributeDies(t);
-      logEvent(`☠️ ${bold(t)} inhaled the poison and died.`);
-    }
-  }
-}
-
-// Simulation
-function simulateDay() {
-  if (dayCount === 0) {
-    logEvent(`<b>🌅 The Bloodbath Begins!</b>`);
-    const initialKills = Math.min(6, Math.floor(aliveTributes.length / 3));
-    for (let i = 0; i < initialKills; i++) {
-      const [a, b] = selectCombatPair();
-      const winner = getCombatWinner(a, b);
-      const loser = winner === a ? b : a;
-      winner.kills++;
-      tributeDies(loser);
-      logEvent(`🩸 ${getCombatEvent(winner, loser)}`);
-    }
-    dayCount++;
-    setTimeout(simulateDay, 2500);
-    return;
-  }
-
-  logEvent(`\n☀️ <b>Day ${dayCount}</b>`);
-
-  if (Math.random() < 0.5) simulateArenaEvent();
-
-  if (Math.random() < 0.6 && aliveTributes.length > 1) {
-    const [a, b] = selectCombatPair();
-    const winner = getCombatWinner(a, b);
-    const loser = winner === a ? b : a;
-    winner.kills++;
-    tributeDies(loser);
-    logEvent(`⚔️ ${getCombatEvent(winner, loser)}`);
-  } else {
-    const survivor = randomTribute();
-    const outcome = Math.random();
-    if (outcome < 0.5) {
-      logEvent(`🫥 ${bold(survivor)} avoided danger using stealth.`);
-    } else {
-      logEvent(`⛺ ${bold(survivor)} crafted traps and survived the day.`);
-    }
-  }
-
-  logEvent(`\n🌙 <b>Night ${dayCount}</b>`);
-  if (Math.random() < 0.3 && aliveTributes.length > 1) {
-    const [a, b] = selectCombatPair();
-    const winner = getCombatWinner(a, b);
-    const loser = winner === a ? b : a;
-    winner.kills++;
-    tributeDies(loser);
-    logEvent(`🌌 In the night, ${getCombatEvent(winner, loser)}`);
-  } else {
-    logEvent("🌜 Quiet settles over the arena.");
-  }
-
-  simulateFallenTributes();
-
-  dayCount++;
-
+function runDayNight(phase) {
+  const count = randomInt(2, 6);
   if (aliveTributes.length <= 1) {
-    const winner = aliveTributes[0];
-    if (winner) {
-      logEvent(`\n🏆 <b>${winner.name} (D${winner.district})</b> is the Victor!`);
-    } else {
-      logEvent(`\n💀 All tributes have perished. No victor emerges.`);
-    }
-
-    showSummary();
-    simulationRunning = false;
-    startSimBtn.disabled = false;
-    resetBtn.disabled = false;
-    downloadLogBtn.disabled = false;
+    endGame();
     return;
   }
-
-  setTimeout(simulateDay, 4000);
+  gameLog += `\n${phase === "Day" ? "☀️" : "🌙"} **${phase} ${dayCount}** ${phase === "Day" ? "☀️" : "🌙"}\n`;
+  const useArena = Math.random() < 0.4 && usedArenaEvents.length < arenaEvents.length;
+  if (useArena) {
+    const available = arenaEvents.filter(a => !usedArenaEvents.includes(a.name));
+    const chosen = randomFrom(available);
+    usedArenaEvents.push(chosen.name);
+    processArenaEvent(chosen);
+  } else {
+    processEvents(count, false);
+  }
+  endPhase(phase);
 }
 
-function showSummary() {
-  const placements = [...tributes].sort((a, b) => {
-    const aDead = fallenTributes.includes(a);
-    const bDead = fallenTributes.includes(b);
-    if (aDead && bDead) return fallenTributes.indexOf(a) - fallenTributes.indexOf(b);
-    return aDead ? 1 : -1;
-  });
+function processEvents(count, isBloodbath) {
+  for (let i = 0; i < count; i++) {
+    const actor = randomFrom(aliveTributes);
+    if (!actor.alive) continue;
+    const others = aliveTributes.filter(t => t !== actor && t.alive);
 
-  logEvent(`<br><b>📊 Final Standings:</b>`);
-  placements.forEach((t, i) => {
-    const place = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}th`;
-    logEvent(`${place}: ${t.name} (D${t.district}) — 💀 ${t.kills} kill${t.kills !== 1 ? "s" : ""}`);
-  });
+    if (others.length === 0) break;
+    const target = randomFrom(others);
+
+    // District-mate bias: avoid killing unless necessary
+    if (actor.district === target.district && others.length > 2 && Math.random() < 0.85) continue;
+
+    const actorScore = actor.training + Math.random() * 6;
+    const targetScore = target.training + Math.random() * 6;
+
+    const wins = actorScore >= targetScore;
+
+    if (wins) {
+      gameLog += format(actions[isBloodbath ? "bloodbath" : "kill"], actor, target) + "\n";
+      target.alive = false;
+      actor.kills++;
+      fallenToday.push(target);
+    } else {
+      gameLog += format(actions[isBloodbath ? "bloodbath" : "kill"], target, actor) + "\n";
+      actor.alive = false;
+      target.kills++;
+      fallenToday.push(actor);
+    }
+  }
 }
 
-// Start & Reset
-startSimBtn.addEventListener("click", () => {
-  if (tributes.length < 2) return alert("Need at least 2 tributes to start.");
+function processArenaEvent(event) {
+  gameLog += `\n⚠️ Arena Event: **${event.name}** ⚠️\n`;
+  const affected = aliveTributes.filter(() => Math.random() < 0.5);
 
-  aliveTributes = tributes.map(t => ({ ...t, kills: 0 }));
-  fallenTributes = [];
-  eventLog = [];
+  for (let tribute of affected) {
+    if (!tribute.alive) continue;
+    if (event.type === "feast" && Math.random() < 0.4) {
+      const others = aliveTributes.filter(t => t !== tribute && t.alive);
+      if (others.length === 0) continue;
+      const target = randomFrom(others);
+      gameLog += format(actions.arena[event.name][0], tribute, target) + "\n";
+      target.alive = false;
+      tribute.kills++;
+      fallenToday.push(target);
+    } else if (Math.random() < 0.4) {
+      gameLog += format(actions.arena[event.name][0], tribute) + "\n";
+      tribute.alive = false;
+      fallenToday.push(tribute);
+    } else {
+      gameLog += format(actions.arena[event.name][1], tribute) + "\n";
+    }
+  }
+}
+
+function endPhase(phaseName) {
+  showFallenTributes();
+  aliveTributes = tributes.filter(t => t.alive);
+  if (aliveTributes.length <= 1) {
+    endGame();
+  } else if (phaseName === "Bloodbath") {
+    dayCount++;
+    setTimeout(() => runDayNight("Day"), 500);
+  } else if (phaseName.startsWith("Day")) {
+    setTimeout(() => runDayNight("Night"), 500);
+  } else if (phaseName.startsWith("Night")) {
+    dayCount++;
+    setTimeout(() => runDayNight("Day"), 500);
+  }
+}
+
+function showFallenTributes() {
+  if (fallenToday.length === 0) {
+    gameLog += `\n🕊️ No tributes fell this phase.\n`;
+  } else {
+    gameLog += `\n💀 **Fallen Tributes** 💀\n`;
+    fallenToday.forEach(t => {
+      gameLog += `🔔 ${t.name} (D${t.district}) — Age ${t.age}\n`;
+    });
+  }
+  fallenToday = [];
+  document.getElementById("log").innerHTML = gameLog.replace(/\n/g, "<br>");
+}
+
+function endGame() {
+  gameRunning = false;
+  const placements = tributes
+    .map(t => ({ ...t }))
+    .sort((a, b) => (a.alive === b.alive ? b.kills - a.kills : a.alive ? -1 : 1));
+
+  let placement = 1;
+  placements.forEach(t => {
+    if (t.alive) t.placement = 1;
+    else t.placement = placement++;
+  });
+
+  gameLog += `\n🏆 **Final Standings** 🏆\n`;
+  placements.forEach(t => {
+    gameLog += `#${t.placement} — ${t.name} (D${t.district}) — ${t.kills} kill${t.kills !== 1 ? "s" : ""}\n`;
+  });
+
+  document.getElementById("log").innerHTML = gameLog.replace(/\n/g, "<br>");
+  document.getElementById("resetBtn").style.display = "block";
+  document.getElementById("downloadBtn").style.display = "block";
+}
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  tributes.length = 0;
   dayCount = 0;
-  eventLogElem.innerHTML = "";
-  simulationRunning = true;
-  startSimBtn.disabled = true;
-  resetBtn.disabled = false;
-  simulateDay();
-});
-
-resetBtn.addEventListener("click", () => {
-  tributes = [];
   aliveTributes = [];
-  fallenTributes = [];
-  eventLog = [];
-  dayCount = 0;
-  alliances = [];
-  eventLogElem.innerHTML = "";
-  renderTributeList();
-  resetBtn.disabled = true;
-  downloadLogBtn.disabled = true;
+  gameLog = "";
+  fallenToday = [];
+  usedArenaEvents = [];
+  gameRunning = false;
+  document.getElementById("log").innerHTML = "";
+  updateTributeDisplay();
+  document.getElementById("resetBtn").style.display = "none";
+  document.getElementById("downloadBtn").style.display = "none";
 });
 
-downloadLogBtn.addEventListener("click", () => {
-  const blob = new Blob([eventLog.join("\n").replace(/<[^>]*>/g, '')], { type: "text/plain" });
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const blob = new Blob([gameLog], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "hunger_games_log.txt";
+  a.download = "hunger_games_simulation.txt";
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
 });
+
+function format(templateArray, actor, target = null) {
+  const template = randomFrom(templateArray);
+  return template
+    .replace(/\${actor.name}/g, actor.name)
+    .replace(/\${actor.district}/g, actor.district)
+    .replace(/\${actor.weapon}/g, actor.weapon)
+    .replace(/\${target.name}/g, target?.name || "")
+    .replace(/\${target.district}/g, target?.district || "");
+}
