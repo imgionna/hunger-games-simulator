@@ -88,12 +88,9 @@ document.getElementById("randomizeBtn").addEventListener("click", () => {
   document.getElementById("name").value = `Tribute${tributes.length + 1}`;
   document.getElementById("age").value = randomInt(12, 18);
   document.getElementById("weapon").value = randomFrom(weapons);
-
   ["combat", "survival", "stealth", "speed", "strength", "intelligence"].forEach(skill => {
     document.getElementById(skill).value = randomInt(0, 12);
   });
-
-  // Gender and District remain unchanged from user input
 });
 
 document.getElementById("createBtn").addEventListener("click", () => {
@@ -161,7 +158,7 @@ function processEvents(count, isBloodbath) {
     if (others.length === 0) break;
     const target = randomFrom(others);
 
-    // District-mate bias: avoid killing unless necessary
+    // Avoid killing same-district tributes unless necessary
     if (actor.district === target.district && others.length > 2 && Math.random() < 0.85) continue;
 
     const actorScore = actor.training + Math.random() * 6;
