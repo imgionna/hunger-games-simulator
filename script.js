@@ -84,14 +84,16 @@ function randomFrom(array) {
 }
 
 document.getElementById("randomizeBtn").addEventListener("click", () => {
+  // Only randomise name, age, weapon, and skills
   document.getElementById("name").value = `Tribute${tributes.length + 1}`;
-  document.getElementById("gender").value = randomFrom(["Male", "Female"]);
   document.getElementById("age").value = randomInt(12, 18);
-  document.getElementById("district").value = randomInt(1, 12);
   document.getElementById("weapon").value = randomFrom(weapons);
+
   ["combat", "survival", "stealth", "speed", "strength", "intelligence"].forEach(skill => {
     document.getElementById(skill).value = randomInt(0, 12);
   });
+
+  // Gender and District remain unchanged from user input
 });
 
 document.getElementById("createBtn").addEventListener("click", () => {
