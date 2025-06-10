@@ -1,55 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hunger Games Simulator</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hunger Games Simulator</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Hunger Games Simulator 🍿</h1>
 
-  <section class="form-section">
-    <input type="text" id="name" placeholder="Name" />
-    <select id="gender">
-      <option value="Male">♂️ Male</option>
-      <option value="Female">♀️ Female</option>
-    </select>
-    <input type="number" id="age" placeholder="Age" min="12" max="18" />
-    <input type="number" id="district" placeholder="District (1-12)" min="1" max="12" />
-    <input type="text" id="weapon" placeholder="Weapon" />
+<div class="container">
+  <h1>Hunger Games Simulator</h1>
 
-    <div class="skills">
-      <input type="number" id="combat" placeholder="Combat (0-12)" min="0" max="12" />
-      <input type="number" id="survival" placeholder="Survival (0-12)" min="0" max="12" />
-      <input type="number" id="stealth" placeholder="Stealth (0-12)" min="0" max="12" />
-      <input type="number" id="speed" placeholder="Speed (0-12)" min="0" max="12" />
-      <input type="number" id="strength" placeholder="Strength (0-12)" min="0" max="12" />
-      <input type="number" id="intelligence" placeholder="Intelligence (0-12)" min="0" max="12" />
-    </div>
+  <section class="tribute-creator">
+    <h2>Create Tribute</h2>
+    <form id="tributeForm" onsubmit="return false;">
+      <label>
+        Name:
+        <input type="text" id="name" required />
+      </label>
 
-    <div class="buttons">
-      <button id="randomizeBtn">🎲 Randomize</button>
-      <button id="createBtn">➕ Add Tribute</button>
-    </div>
+      <label>
+        Gender:
+        <select id="gender" required>
+          <option value="Male" selected>Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </label>
+
+      <label>
+        Age:
+        <input type="number" id="age" min="12" max="18" required />
+      </label>
+
+      <label>
+        District:
+        <select id="district" required>
+          <!-- 12 districts -->
+          <option value="1">District 1</option>
+          <option value="2">District 2</option>
+          <option value="3">District 3</option>
+          <option value="4">District 4</option>
+          <option value="5">District 5</option>
+          <option value="6">District 6</option>
+          <option value="7">District 7</option>
+          <option value="8">District 8</option>
+          <option value="9">District 9</option>
+          <option value="10">District 10</option>
+          <option value="11">District 11</option>
+          <option value="12">District 12</option>
+        </select>
+      </label>
+
+      <label>
+        Weapon:
+        <select id="weapon" required>
+          <option value="knife">Knife</option>
+          <option value="spear">Spear</option>
+          <option value="bow">Bow</option>
+          <option value="axe">Axe</option>
+          <option value="slingshot">Slingshot</option>
+          <option value="rock">Rock</option>
+        </select>
+      </label>
+
+      <fieldset>
+        <legend>Skills (0-12)</legend>
+        <label>Combat: <input type="number" id="combat" min="0" max="12" value="0" required /></label>
+        <label>Survival: <input type="number" id="survival" min="0" max="12" value="0" required /></label>
+        <label>Stealth: <input type="number" id="stealth" min="0" max="12" value="0" required /></label>
+        <label>Speed: <input type="number" id="speed" min="0" max="12" value="0" required /></label>
+        <label>Strength: <input type="number" id="strength" min="0" max="12" value="0" required /></label>
+        <label>Intelligence: <input type="number" id="intelligence" min="0" max="12" value="0" required /></label>
+      </fieldset>
+
+      <div class="buttons">
+        <button id="randomizeBtn" type="button">Randomize Tribute</button>
+        <button id="createBtn" type="button">Add Tribute</button>
+      </div>
+    </form>
   </section>
 
-  <section>
-    <h2>Tributes 👥</h2>
+  <section class="tributes-list">
+    <h2>Tributes Created</h2>
     <div id="tributeList" class="tribute-list"></div>
   </section>
 
-  <section>
-    <button id="startSimBtn">🚀 Start Simulation</button>
-    <button id="resetBtn" disabled>🔄 Reset</button>
-    <button id="downloadLogBtn" disabled>💾 Download Log</button>
+  <section class="simulation-controls">
+    <button id="startSimBtn" type="button">Start Simulation</button>
+    <button id="resetBtn" type="button" style="display:none;">Reset Game</button>
+    <button id="downloadBtn" type="button" style="display:none;">Download Log</button>
   </section>
 
-  <section>
-    <h2>Event Log 📜</h2>
-    <div id="eventLog" class="event-log"></div>
+  <section class="log-section">
+    <h2>Game Log</h2>
+    <div id="log" class="game-log"></div>
   </section>
+</div>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
